@@ -1,0 +1,37 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Organize Media Library\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Katsushi Kawamori <dodesyoswift312@gmail.com>\n"
+"Language-Team:  <dodesyoswift312@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.7\n"
+
+msgid "Search & Rebuild & Organize"
+msgstr ""
+
+msgid ""
+"Thumbnails rebuild and organize uploads into month- and year-based folders."
+msgstr ""
+
+msgid "The following media has been rebuild organize."
+msgstr ""
+
+msgid ""
+"Please try again pressing Back button, if the processing is stopped on the "
+"way."
+msgstr ""
+
+msgid ""
+"I need a donation. This is because, I want to continue the development and "
+"support of plugins."
+msgstr ""
+
+msgid "Set the number of seconds a script is allowed to run."
+msgstr ""
+
+msgid "The max_execution_time value defined in the php.ini."
+msgstr ""
