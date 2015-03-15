@@ -4,17 +4,18 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, audios, gallery, thumbnails, uploads, images, media, media library, videos
 Requires at least: 3.0.1
 Tested up to: 4.1.1
-Stable tag: 1.0
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Thumbnails rebuild and organize uploads into month- and year-based folders.
+Thumbnails rebuild and organize uploads into month- and year-based folders. URL in the content, replace with the new URL.
 
 == Description ==
 
 * This rebuild a thumbnail of the image file.
 * Organize uploads into month- and year-based folders.
 * This rebuild a metadata(Images, Videos, Audios).
+* URL in the content, replace with the new URL.
 
 Translators
 *   Japanese (ja) - [<a href="http://riverforest-wp.info/">Katsushi Kawamori</a>]
@@ -37,9 +38,14 @@ none
 
 == Changelog ==
 
+= 1.1 =
+URL in the content, replace with the new URL.
+Change languages.
+
 = 1.0 =
 
 == Upgrade Notice ==
 
+= 1.1 =
 = 1.0 =
 

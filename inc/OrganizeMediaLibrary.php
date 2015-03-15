@@ -94,12 +94,13 @@ class OrganizeMediaLibrary {
 
 		$re_attache = get_post( $re_id_attache );
 		$new_attach_title = $re_attache->post_title;
-		$new_url_attach = wp_get_attachment_url( $re_id_attache );
+		$url_attach = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL.'/'.get_post_meta($re_id_attache, '_wp_attached_file', true);
+		$new_url_attach = $url_attach;
 
-		$exts = explode('.', $new_url_attach);
+		$exts = explode('.', $url_attach);
 		$ext = end($exts);
 
-		$filename = str_replace(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL.'/', '', $new_url_attach);
+		$filename = str_replace(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL.'/', '', $url_attach);
 
 		$postdategmt = $re_attache->post_modified_gmt;
 
@@ -126,12 +127,25 @@ class OrganizeMediaLibrary {
 
 				update_post_meta( $re_id_attache, '_wp_attached_file', $filename );
 
-				$up_post = array(
-								'ID' => $re_id_attache,
-								'guid' => esc_url($new_url_attach)
-							);
-				wp_update_post( $up_post );
+				global $wpdb;
 
+				// Change DB contents
+				$search_url = str_replace('.'.$ext, '', $url_attach);
+				$replace_url = str_replace('.'.$ext, '', $new_url_attach);
+				$sql = $wpdb->prepare(
+					"UPDATE `$wpdb->posts` SET post_content = replace(post_content, %s, %s)",
+					$search_url,
+					$replace_url
+				);
+				$wpdb->query($sql);
+
+				// Change DB Attachement post guid
+				$update_array = array(
+								'guid'=> $new_url_attach
+							);
+				$id_array= array('ID'=> $re_id_attache);
+				$wpdb->update( $wpdb->posts, $update_array, $id_array, array('%s'), array('%d') );
+				unset($update_array, $id_array);
 			}
 		}
 

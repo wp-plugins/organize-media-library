@@ -15,8 +15,11 @@ msgid "Search & Rebuild & Organize"
 msgstr "検索＆再構築＆整理"
 
 msgid ""
-"Thumbnails rebuild and organize uploads into month- and year-based folders."
-msgstr "サムネイルを再構築し、年月ベースのフォルダに整理します。"
+"Thumbnails rebuild and organize uploads into month- and year-based folders. "
+"URL in the content, replace with the new URL."
+msgstr ""
+"サムネイルを再構築し、年月ベースのフォルダに整理します。コンテンツ内のURLは、"
+"新しいURLで置き換えます。"
 
 msgid "The following media has been rebuild organize."
 msgstr "以下のメディアは、整理・再構築されています。"

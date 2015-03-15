@@ -112,7 +112,7 @@ class OrganizeMediaLibraryAdmin {
 				</ul>
 				<div id="organizemedialibrary-tabs-1">
 
-		<h3><?php _e('Thumbnails rebuild and organize uploads into month- and year-based folders.', 'organizemedialibrary'); ?></h3>
+		<h3><?php _e('Thumbnails rebuild and organize uploads into month- and year-based folders. URL in the content, replace with the new URL.', 'organizemedialibrary'); ?></h3>
 
 		<?php
 
@@ -166,27 +166,19 @@ class OrganizeMediaLibraryAdmin {
 				$url_attachs = explode('/', $url_attach);
 				$input_html .= '<div>'.__('File name:').' '.end($url_attachs).'</div>';
 
+				$input_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 				if ( wp_ext2type($ext) === 'image' ) {
-					$input_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 					$input_html .= '<div>'.__('Images').': ';
 					foreach ( $imagethumburls as $thumbsize => $imagethumburl ) {
 						$input_html .= '[<a href="'.$imagethumburl.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$thumbsize.'</a>]';
 					}
 					$input_html .= '</div>';
-				} else if ( wp_ext2type($ext) === 'video' ) {
-					$input_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
-					$input_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
-					$input_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
-					$input_html .= '<div>'.__('Length:').' '.$length.'</div>';
-				} else if ( wp_ext2type($ext) === 'audio' ) {
-					$input_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
-					$input_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
-					$input_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
-					$input_html .= '<div>'.__('Length:').' '.$length.'</div>';
 				} else {
-					$input_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 					$input_html .= '<div>'.__('File type:').' '.$filetype.'</div>';
 					$input_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
+					if ( wp_ext2type($ext) === 'video' || wp_ext2type($ext) === 'audio' ) {
+						$input_html .= '<div>'.__('Length:').' '.$length.'</div>';
+					}
 				}
 
 				$input_html .= '</div>';

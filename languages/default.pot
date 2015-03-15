@@ -14,7 +14,7 @@ msgid "Search & Rebuild & Organize"
 msgstr ""
 
 msgid ""
-"Thumbnails rebuild and organize uploads into month- and year-based folders."
+"Thumbnails rebuild and organize uploads into month- and year-based folders. URL in the content, replace with the new URL."
 msgstr ""
 
 msgid "The following media has been rebuild organize."
