@@ -87,7 +87,7 @@ class OrganizeMediaLibrary {
 	/* ==================================================
 	 * @param	int		$re_id_attache
 	 * @param	bool	$yearmonth_folders
-	 * @return	array	$ext(string), $new_attach_title(string), $new_url_attach(string)
+	 * @return	array	$ext(string), $new_attach_title(string), $new_url_attach(string), $url_replace_contents(string)
 	 * @since	1.0
 	 */
 	function regist($re_id_attache, $yearmonth_folders){
@@ -96,6 +96,7 @@ class OrganizeMediaLibrary {
 		$new_attach_title = $re_attache->post_title;
 		$url_attach = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL.'/'.get_post_meta($re_id_attache, '_wp_attached_file', true);
 		$new_url_attach = $url_attach;
+		$url_replace_contents = NULL;
 
 		$exts = explode('.', $url_attach);
 		$ext = end($exts);
@@ -132,6 +133,20 @@ class OrganizeMediaLibrary {
 				// Change DB contents
 				$search_url = str_replace('.'.$ext, '', $url_attach);
 				$replace_url = str_replace('.'.$ext, '', $new_url_attach);
+
+				// Search
+				$search_posts = $wpdb->get_results(
+					"SELECT post_title,post_status,guid FROM $wpdb->posts WHERE instr(post_content, '$search_url') > 0"
+				);
+				if ( $search_posts ) {
+					foreach ($search_posts as $search_post){
+						if ( $search_post->post_status === 'publish' ) {
+							$url_replace_contents .= '[<a href="'.$search_post->guid.'" target="_blank"> '.$search_post->post_title.'</a>]';
+						}
+					}
+				}
+
+				// Replace
 				$sql = $wpdb->prepare(
 					"UPDATE `$wpdb->posts` SET post_content = replace(post_content, %s, %s)",
 					$search_url,
@@ -166,7 +181,7 @@ class OrganizeMediaLibrary {
 			$metadata = NULL;
 		}
 
-		return array($ext, $new_attach_title, $new_url_attach);
+		return array($ext, $new_attach_title, $new_url_attach, $url_replace_contents);
 
 	}
 

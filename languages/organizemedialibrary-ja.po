@@ -41,3 +41,6 @@ msgstr "スクリプトが実行可能な秒数を設定します。"
 
 msgid "The max_execution_time value defined in the php.ini."
 msgstr "php.iniで定義されたmax_execution_timeの値。"
+
+msgid "Replaced URL:"
+msgstr "置換URL:"

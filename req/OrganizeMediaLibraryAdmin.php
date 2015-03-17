@@ -221,7 +221,7 @@ class OrganizeMediaLibraryAdmin {
 							$re_id_attache = intval($postval1[$postkey2]);
 
 							// Rebuild
-							list($ext, $new_attach_title, $new_url_attach) = $organizemedialibrary->regist($re_id_attache, $yearmonth_folders);
+							list($ext, $new_attach_title, $new_url_attach, $url_replace_contents) = $organizemedialibrary->regist($re_id_attache, $yearmonth_folders);
 
 							list($imagethumburls, $mimetype, $length, $thumbnail_img_url, $stamptime, $file_size, $filetype) = $organizemedialibrary->getmeta($ext, $re_id_attache);
 
@@ -255,6 +255,9 @@ class OrganizeMediaLibraryAdmin {
 								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 								$output_html .= '<div>'.__('File type:').' '.$filetype.'</div>';
 								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
+							}
+							if ( !empty($url_replace_contents) ) {
+								$output_html .= '<div>'.__('Replaced URL:', 'organizemedialibrary').' '.$url_replace_contents.'</div>';
 							}
 
 							$output_html .= '</div>';
