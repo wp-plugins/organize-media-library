@@ -2,7 +2,7 @@
 /*
 Plugin Name: Organize Media Library
 Plugin URI: http://wordpress.org/plugins/organize-media-library/
-Version: 1.2
+Version: 1.3
 Description: Thumbnails rebuild and organize uploads into month- and year-based folders. URL in the content, replace with the new URL.
 Author: Katsushi Kawamori
 Author URI: http://riverforest-wp.info/
@@ -31,9 +31,12 @@ Domain Path: /languages
 	define("ORGANIZEMEDIALIBRARY_PLUGIN_BASE_DIR", dirname(__FILE__));
 	define("ORGANIZEMEDIALIBRARY_PLUGIN_URL", plugins_url($path='',$scheme=null).'/organize-media-library');
 	$wp_uploads = wp_upload_dir();
-	define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL", $wp_uploads['baseurl']);
+	if(is_ssl()){
+		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL", str_replace('http:', 'https:', $wp_uploads['baseurl']));
+	} else {
+		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL", $wp_uploads['baseurl']);
+	}
 	define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR", $wp_uploads['basedir']);
-	define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH", str_replace(site_url('/'), '', ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL));
 
 	require_once( ORGANIZEMEDIALIBRARY_PLUGIN_BASE_DIR.'/req/OrganizeMediaLibraryRegist.php' );
 	$organizemedialibraryregist = new OrganizeMediaLibraryRegist();
