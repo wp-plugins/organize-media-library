@@ -100,6 +100,7 @@ class OrganizeMediaLibrary {
 
 		$exts = explode('.', $url_attach);
 		$ext = end($exts);
+		$suffix_attach_file = '.'.$ext;
 
 		$filename = str_replace(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL.'/', '', $url_attach);
 
@@ -110,30 +111,29 @@ class OrganizeMediaLibrary {
 			$y = substr( $postdategmt, 0, 4 );
 			$m = substr( $postdategmt, 5, 2 );
 			$subdir = "/$y/$m";
-			if ( ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.'/'.$filename <> ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.$subdir.'/'.wp_basename($filename) ) {
+			$filename_base = wp_basename($filename);
+			if ( ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.'/'.$filename <> ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.$subdir.'/'.$filename_base ) {
 
 				if ( !file_exists(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.$subdir) ) {
 					mkdir(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.$subdir, 0757, true);
 				}
-				copy( ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.'/'.$filename, ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.$subdir.'/'.wp_basename($filename) );
-
+				if ( file_exists(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.$subdir.'/'.$filename_base) ) {
+					$filename_base = wp_basename($filename, $suffix_attach_file).date_i18n( "dHis", FALSE, FALSE ).$suffix_attach_file;
+				}
+				copy( ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.'/'.$filename, ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.$subdir.'/'.$filename_base );
 				$filedirname = str_replace( wp_basename( $filename ), '', $filename );
 				$delfilename = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.'/'.$filedirname.wp_basename( $filename, '.'.$ext ).'*';
 				foreach ( glob($delfilename) as $val ) {
 					unlink($val);
 				}
-
-				$filename = ltrim($subdir, '/').'/'.wp_basename($filename);
+				$filename = ltrim($subdir, '/').'/'.$filename_base;
 				$new_url_attach = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL.'/'.$filename;
-
 				update_post_meta( $re_id_attache, '_wp_attached_file', $filename );
 
 				global $wpdb;
-
 				// Change DB contents
 				$search_url = str_replace('.'.$ext, '', $url_attach);
 				$replace_url = str_replace('.'.$ext, '', $new_url_attach);
-
 				// Search
 				$search_posts = $wpdb->get_results(
 					"SELECT post_title,post_status,guid FROM $wpdb->posts WHERE instr(post_content, '$search_url') > 0"
