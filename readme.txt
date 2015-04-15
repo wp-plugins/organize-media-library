@@ -2,9 +2,9 @@
 Contributors: Katsushi Kawamori
 Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, audios, gallery, thumbnails, uploads, images, media, media library, videos
-Requires at least: 3.0.1
+Requires at least: 3.6.0
 Tested up to: 4.1.1
-Stable tag: 1.4
+Stable tag: 1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,6 +38,9 @@ none
 
 == Changelog ==
 
+= 1.5 =
+Fixed problem of read of metadata for video and audio.
+
 = 1.4 =
 Fixed problem of overwriting when there is a file with the same name in years month based folders.
 
@@ -55,6 +58,7 @@ Change languages.
 
 == Upgrade Notice ==
 
+= 1.5 =
 = 1.4 =
 = 1.3 =
 = 1.2 =
