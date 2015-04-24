@@ -3,8 +3,8 @@ Contributors: Katsushi Kawamori
 Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, audios, gallery, thumbnails, uploads, images, media, media library, videos
 Requires at least: 3.6.0
-Tested up to: 4.1.1
-Stable tag: 1.5
+Tested up to: 4.2
+Stable tag: 1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,6 +38,10 @@ none
 
 == Changelog ==
 
+= 1.6 =
+Add progress display.
+Change /languages.
+
 = 1.5 =
 Fixed problem of read of metadata for video and audio.
 
@@ -58,6 +62,7 @@ Change languages.
 
 == Upgrade Notice ==
 
+= 1.6 =
 = 1.5 =
 = 1.4 =
 = 1.3 =

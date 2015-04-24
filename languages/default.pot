@@ -25,9 +25,7 @@ msgid ""
 "way."
 msgstr ""
 
-msgid ""
-"I need a donation. This is because, I want to continue the development and "
-"support of plugins."
+msgid "Please make a donation if you like my work or would like to further the development of this plugin."
 msgstr ""
 
 msgid "Set the number of seconds a script is allowed to run."

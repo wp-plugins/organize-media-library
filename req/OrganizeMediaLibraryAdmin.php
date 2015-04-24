@@ -125,6 +125,8 @@ class OrganizeMediaLibraryAdmin {
 		$count = 0;
 		$this->postcount = 0;
 
+		echo '<div id="organizemedialibrary-loading" style="position: relative; left: 40%; top: 10%;"><img src="'.ORGANIZEMEDIALIBRARY_PLUGIN_URL.'/css/loading.gif"></div>';
+		echo '<div id="organizemedialibrary-loading-container" style="display: none;">';
 		if ( $adddb <> 'TRUE' ) {
 			foreach ( $attachments as $attachment ){
 
@@ -136,7 +138,7 @@ class OrganizeMediaLibraryAdmin {
 					<div class="submit">
 						<input type="hidden" name="organizemedialibrary-tabs" value="1" />
 						<input type="hidden" name="adddb" value="TRUE">
-						<input type="submit" value="<?php _e('Update Media'); ?>" />
+						<input type="submit" class="button-primary button-large" value="<?php _e('Update Media'); ?>" />
 					</div>
 					<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
 					<input type="checkbox" id="group_organize-media-library" class="organizemedialibrary-checkAll"><?php _e('Select all'); ?>
@@ -194,24 +196,25 @@ class OrganizeMediaLibraryAdmin {
 			<div class="submit">
 				<input type="hidden" name="organizemedialibrary-tabs" value="1" />
 				<input type="hidden" name="adddb" value="TRUE">
-				<input type="submit" value="<?php _e('Update Media'); ?>" />
+				<input type="submit" class="button-primary button-large" value="<?php _e('Update Media'); ?>" />
 			</div>
 			</form>
 			<?php
-		}
-
-		if ( $adddb === 'TRUE' ) {
+		} else { // $adddb === 'TRUE'
 			$re_id_attaches = $_POST["re_id_attaches"];
 			if (!empty($re_id_attaches)) {
 				?>
-				<form method="post" action="<?php echo $scriptname; ?>">
-					<div class="submit">
-						<input type="hidden" name="organizemedialibrary-tabs" value="1" />
-						<input type="submit" value="<?php _e('Back'); ?>" />
-					</div>
+				<div class="submit">
+				<form method="post" style="float: left;" action="<?php echo $scriptname; ?>">
+					<input type="hidden" name="organizemedialibrary-tabs" value="1" />
+					<input type="submit" value="<?php _e('Back'); ?>" />
 				</form>
+				<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
+					<input type="submit" value="<?php _e('Media Library'); ?>" />
+				</form>
+				</div>
+				<div style="clear:both"></div>
 				<?php
-				echo'<div class="error"><ul><li>'.__('Please try again pressing Back button, if the processing is stopped on the way.', 'organizemedialibrary').'</li></ul></div>';
 
 				$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
 
@@ -283,6 +286,7 @@ class OrganizeMediaLibraryAdmin {
 			<div style="clear:both"></div>
 			<?php
 		}
+		echo '</div>';
 
 		?>
 		</div>
@@ -321,7 +325,7 @@ class OrganizeMediaLibraryAdmin {
 
 		<div id="organizemedialibrary-tabs-3">
 		<div class="wrap">
-			<h3><?php _e('I need a donation. This is because, I want to continue the development and support of plugins.', 'organizemedialibrary'); ?></h3>
+			<h3><?php _e('Please make a donation if you like my work or would like to further the development of this plugin.', 'organizemedialibrary'); ?></h3>
 			<div align="right">Katsushi Kawamori</div>
 			<h3 style="float: left;"><?php _e('Donate to this plugin &#187;'); ?></h3>
 <a href='https://pledgie.com/campaigns/28307' target="_blank"><img alt='Click here to lend your support to: Various Plugins for WordPress and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/28307.png?skin_name=chrome' border='0' ></a>
@@ -389,6 +393,12 @@ jQuery(function(){
     jQuery('.' + this.id).prop('checked', this.checked);
   });
 });
+</script>
+<script type="text/javascript">
+window.addEventListener( "load", function(){
+  jQuery("#organizemedialibrary-loading").delay(2000).fadeOut();
+  jQuery("#organizemedialibrary-loading-container").delay(2000).fadeIn();
+}, false );
 </script>
 <!-- END: Organize Media Library -->
 
