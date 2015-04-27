@@ -1,0 +1,36 @@
+.organizemedialibrary-pages {
+	width: 100%;
+	text-align: center;
+	margin: 30px;
+	height: 0;
+}
+
+.organizemedialibrary-pages .organizemedialibrary-links {
+	font-size: 18px;
+}
+
+.organizemedialibrary-pages .organizemedialibrary-links a {
+	padding: 8px 20px 11px;
+	font-size: 18px;
+	text-decoration: none;
+	background: #d3d3d3;
+}
+
+.organizemedialibrary-pages .organizemedialibrary-links a:hover {
+	color: #000000;
+	background: #d3d3d3;
+}
+
+.organizemedialibrary-pages .organizemedialibrary-links {
+	padding: 10px;
+	font-size: 14px;
+}
+
+#organizemedialibrary-loading-container {
+	display: none;
+}
+#organizemedialibrary-loading {
+	position: relative;
+	left: 40%;
+	top: 10%;
+}

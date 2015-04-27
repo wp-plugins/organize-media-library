@@ -44,3 +44,6 @@ msgstr "php.iniで定義されたmax_execution_timeの値。"
 
 msgid "Replaced URL:"
 msgstr "置換URL:"
+
+msgid "Number of titles to show to this page"
+msgstr "このページへ表示数するタイトルの数"

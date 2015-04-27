@@ -27,11 +27,34 @@ class OrganizeMediaLibraryRegist {
 	 */
 	function register_settings(){
 
+		$plugin_datas = get_file_data( ORGANIZEMEDIALIBRARY_PLUGIN_BASE_DIR.'/organizemedialibrary.php', array('version' => 'Version') );
+		$plugin_version = floatval($plugin_datas['version']);
+
 		if ( !get_option('organizemedialibrary_settings') ) {
 			$organizemedialibrary_tbl = array(
+								'pagemax' => 20,
 								'max_execution_time' => 300
 							);
 			update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
+		} else {
+			$organizemedialibrary_settings = get_option('organizemedialibrary_settings');
+			if ( $plugin_version < 1.7 ) {
+				$organizemedialibrary_tbl = array(
+									'max_execution_time' => $organizemedialibrary_settings['max_execution_time']
+								);
+				update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
+			} else if ( $plugin_version >= 1.7 ) {
+				if ( array_key_exists( "pagemax", $organizemedialibrary_settings ) ) {
+					$pagemax = $organizemedialibrary_settings['pagemax'];
+				} else {
+					$pagemax = 20;
+				}
+				$organizemedialibrary_tbl = array(
+									'pagemax' => $pagemax,
+									'max_execution_time' => $organizemedialibrary_settings['max_execution_time']
+								);
+				update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
+			}
 		}
 
 	}

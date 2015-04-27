@@ -36,3 +36,6 @@ msgstr ""
 
 msgid "Replaced URL:"
 msgstr ""
+
+msgid "Number of titles to show to this page"
+msgstr ""

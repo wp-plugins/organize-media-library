@@ -53,6 +53,7 @@ class OrganizeMediaLibraryAdmin {
 	function load_custom_wp_admin_style() {
 		wp_enqueue_style( 'jquery-responsiveTabs', ORGANIZEMEDIALIBRARY_PLUGIN_URL.'/css/responsive-tabs.css' );
 		wp_enqueue_style( 'jquery-responsiveTabs-style', ORGANIZEMEDIALIBRARY_PLUGIN_URL.'/css/style.css' );
+		wp_enqueue_style( 'organizemedialibrary',  ORGANIZEMEDIALIBRARY_PLUGIN_URL.'/css/organizemedialibrary.css' );
 		wp_enqueue_script( 'jquery' );
 		wp_enqueue_script( 'jquery-responsiveTabs', ORGANIZEMEDIALIBRARY_PLUGIN_URL.'/js/jquery.responsiveTabs.min.js' );
 
@@ -88,13 +89,22 @@ class OrganizeMediaLibraryAdmin {
 		include_once ORGANIZEMEDIALIBRARY_PLUGIN_BASE_DIR.'/inc/OrganizeMediaLibrary.php';
 		$organizemedialibrary = new OrganizeMediaLibrary();
 		$organizemedialibrary_settings = get_option('organizemedialibrary_settings');
-		$max_execution_time = intval($organizemedialibrary_settings['max_execution_time']);
+		$pagemax = $organizemedialibrary_settings['pagemax'];
+		$max_execution_time = $organizemedialibrary_settings['max_execution_time'];
 
 		set_time_limit($max_execution_time);
 
 		$adddb = FALSE;
 		if (!empty($_POST['adddb'])){
 			$adddb = $_POST['adddb'];
+		}
+
+		$mimefilter = NULL;
+		if( !empty($_GET['mime']) ) {
+			$mimefilter = $_GET['mime'];
+		}
+		if( !empty($_POST['mime']) ) {
+			$mimefilter = $_POST['mime'];
 		}
 
 		$scriptname = admin_url('tools.php?page=organizemedialibrary');
@@ -114,31 +124,72 @@ class OrganizeMediaLibraryAdmin {
 
 		<h3><?php _e('Thumbnails rebuild and organize uploads into month- and year-based folders. URL in the content, replace with the new URL.', 'organizemedialibrary'); ?></h3>
 
+		<div id="organizemedialibrary-loading"><img src="<?php echo ORGANIZEMEDIALIBRARY_PLUGIN_URL; ?>/css/loading.gif"></div>
+		<div id="organizemedialibrary-loading-container">
+
 		<?php
 
 		$args = array(
 			'post_type' => 'attachment',
+			'post_mime_type' => $mimefilter,
 			'numberposts' => -1
 			);
 		$attachments = get_posts($args);
 
+		$pageallcount = 0;
+		// pagenation
+		foreach ( $attachments as $attachment ) {
+			++$pageallcount;
+		}
+		if (!empty($_GET['p'])){
+			$page = $_GET['p'];
+		} else if (!empty($_POST['p'])){
+			$page = $_POST['p'];
+		} else {
+			$page = 1;
+		}
+		$count = 0;
+		$pagebegin = (($page - 1) * $pagemax) + 1;
+		$pageend = $page * $pagemax;
+		$pagelast = ceil($pageallcount / $pagemax);
+
 		$count = 0;
 		$this->postcount = 0;
 
-		echo '<div id="organizemedialibrary-loading" style="position: relative; left: 40%; top: 10%;"><img src="'.ORGANIZEMEDIALIBRARY_PLUGIN_URL.'/css/loading.gif"></div>';
-		echo '<div id="organizemedialibrary-loading-container" style="display: none;">';
 		if ( $adddb <> 'TRUE' ) {
-			foreach ( $attachments as $attachment ){
-
-				++$count;
-				if ( $count == 1 ) {
-
+			?>
+			<form method="post" action="<?php echo $scriptname; ?>">
+				<input type="hidden" name="organizemedialibrary-tabs" value="1" />
+				<input type="hidden" name="adddb" value="FALSE">
+				<div style="float:left;"><?php _e('Number of titles to show to this page', 'organizemedialibrary'); ?>:<input type="text" name="organizemedialibrary_pagemax" value="<?php echo $pagemax; ?>" size="3" /></div>
+				<input type="submit" name="ShowToPage" value="<?php _e('Save') ?>" />
+				<span style="margin-right: 1em;"></span>
+				<select name="mime" style="width: 180px;">
+				<option value=""><?php echo esc_attr( __( 'All Mime types', 'postdatetimechange' ) ); ?></option> 
+				<?php
+				foreach ( wp_get_mime_types() as $exts => $mime ) {
 					?>
-					<form method="post" action="<?php echo $scriptname; ?>">
-					<div class="submit">
-						<input type="hidden" name="organizemedialibrary-tabs" value="1" />
-						<input type="hidden" name="adddb" value="TRUE">
-						<input type="submit" class="button-primary button-large" value="<?php _e('Update Media'); ?>" />
+					<option value="<?php echo esc_attr($mime); ?>"<?php if ($mimefilter === $mime) echo ' selected';?>><?php echo esc_attr($mime); ?></option>
+					<?php
+				}
+				?>
+				</select>
+				<input type="submit" value="<?php _e('Filter'); ?>">
+			</form>
+			<div style="clear:both"></div>
+			<?php
+			if ( $pageallcount > 0 ) {
+				if ( $pagelast > 1 ) {
+					$this->pagenation($page, $pagebegin, $pageend, $pagelast, $scriptname, $mimefilter);
+				}
+				?>
+				<form method="post" action="<?php echo $scriptname; ?>">
+					<input type="hidden" name="organizemedialibrary-tabs" value="1" />
+					<input type="hidden" name="adddb" value="TRUE">
+					<input type="hidden" name="p" value="<?php echo $page; ?>" />
+					<input type="hidden" name="mime" value="<?php echo $mimefilter; ?>" />
+					<div style="padding-top: 5px; padding-bottom: 5px;">
+					<input type="submit" class="button-primary button-large" value="<?php _e('Update Media'); ?>" />
 					</div>
 					<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
 					<input type="checkbox" id="group_organize-media-library" class="organizemedialibrary-checkAll"><?php _e('Select all'); ?>
@@ -146,60 +197,67 @@ class OrganizeMediaLibraryAdmin {
 					<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
 					<?php _e('Select'); ?> & <?php _e('Thumbnail'); ?> & <?php _e('Metadata'); ?>
 					</div>
-					<?php
-				}
+				<?php
+				foreach ( $attachments as $attachment ){
+					++$count;
+					if ( $pagebegin <= $count && $count <= $pageend ) {
+						$attach_id = $attachment->ID;
 
-				$attach_id = $attachment->ID;
+						$title = $attachment->post_title;
+						$url_attach = wp_get_attachment_url( $attach_id );
+						$exts = explode('.', $url_attach);
+						$ext = end($exts);
 
-				$title = $attachment->post_title;
-				$url_attach = wp_get_attachment_url( $attach_id );
-				$exts = explode('.', $url_attach);
-				$ext = end($exts);
+						list($imagethumburls, $mimetype, $length, $thumbnail_img_url, $stamptime, $file_size, $filetype) = $organizemedialibrary->getmeta($ext, $attach_id);
 
-				list($imagethumburls, $mimetype, $length, $thumbnail_img_url, $stamptime, $file_size, $filetype) = $organizemedialibrary->getmeta($ext, $attach_id);
+						$input_html = NULL;
+						$input_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
+						$input_html .= '<input name="re_id_attaches['.$this->postcount.'][id]" type="checkbox" value="'.$attach_id.'" class="group_organize-media-library" style="float: left; margin: 5px;">';
+						$input_html .= '<img width="40" height="40" src="'.$thumbnail_img_url.'">';
+						$input_html .= '<div>'.__('Title').': '.$title.'</div>';
+						$input_html .= '<div>'.__('Permalink:').' <a href="'.get_attachment_link($attach_id).'" target="_blank" style="text-decoration: none; word-break: break-all;">'.get_attachment_link($attach_id).'</a></div>';
+						$input_html .= '<div>URL: <a href="'.$url_attach.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$url_attach.'</a></div>';
+						$url_attachs = explode('/', $url_attach);
+						$input_html .= '<div>'.__('File name:').' '.end($url_attachs).'</div>';
 
-				$input_html = NULL;
-				$input_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
-				$input_html .= '<input name="re_id_attaches['.$this->postcount.'][id]" type="checkbox" value="'.$attach_id.'" class="group_organize-media-library" style="float: left; margin: 5px;">';
-				$input_html .= '<img width="40" height="40" src="'.$thumbnail_img_url.'">';
-				$input_html .= '<div>'.__('Title').': '.$title.'</div>';
-				$input_html .= '<div>'.__('Permalink:').' <a href="'.get_attachment_link($attach_id).'" target="_blank" style="text-decoration: none; word-break: break-all;">'.get_attachment_link($attach_id).'</a></div>';
-				$input_html .= '<div>URL: <a href="'.$url_attach.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$url_attach.'</a></div>';
-				$url_attachs = explode('/', $url_attach);
-				$input_html .= '<div>'.__('File name:').' '.end($url_attachs).'</div>';
+						$input_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
+						if ( wp_ext2type($ext) === 'image' ) {
+							$input_html .= '<div>'.__('Images').': ';
+							foreach ( $imagethumburls as $thumbsize => $imagethumburl ) {
+								$input_html .= '[<a href="'.$imagethumburl.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$thumbsize.'</a>]';
+							}
+							$input_html .= '</div>';
+						} else {
+							$input_html .= '<div>'.__('File type:').' '.$filetype.'</div>';
+							$input_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
+							if ( wp_ext2type($ext) === 'video' || wp_ext2type($ext) === 'audio' ) {
+								$input_html .= '<div>'.__('Length:').' '.$length.'</div>';
+							}
+						}
 
-				$input_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
-				if ( wp_ext2type($ext) === 'image' ) {
-					$input_html .= '<div>'.__('Images').': ';
-					foreach ( $imagethumburls as $thumbsize => $imagethumburl ) {
-						$input_html .= '[<a href="'.$imagethumburl.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$thumbsize.'</a>]';
+						$input_html .= "</div>\n";
+
+						echo $input_html;
+
+						++$this->postcount;
 					}
-					$input_html .= '</div>';
-				} else {
-					$input_html .= '<div>'.__('File type:').' '.$filetype.'</div>';
-					$input_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
-					if ( wp_ext2type($ext) === 'video' || wp_ext2type($ext) === 'audio' ) {
-						$input_html .= '<div>'.__('Length:').' '.$length.'</div>';
-					}
 				}
-
-				$input_html .= '</div>';
-
-				echo $input_html;
-
-				++$this->postcount;
-
+				?>
+					<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
+					<?php _e('Select'); ?> & <?php _e('Thumbnail'); ?> & <?php _e('Metadata'); ?>
+					</div>
+					<div style="padding-top: 5px; padding-bottom: 5px;">
+					<input type="checkbox" id="group_organize-media-library" class="organizemedialibrary-checkAll"><?php _e('Select all'); ?>
+					</div>
+					<div style="padding-top: 5px; padding-bottom: 5px;">
+					<input type="submit" class="button-primary button-large" value="<?php _e('Update Media'); ?>" />
+					</div>
+				</form>
+				<?php
+				if ( $pagelast > 1 ) {
+					$this->pagenation($page, $pagebegin, $pageend, $pagelast, $scriptname, $mimefilter);
+				}
 			}
-
-			?>
-			<form method="post" action="<?php echo $scriptname; ?>">
-			<div class="submit">
-				<input type="hidden" name="organizemedialibrary-tabs" value="1" />
-				<input type="hidden" name="adddb" value="TRUE">
-				<input type="submit" class="button-primary button-large" value="<?php _e('Update Media'); ?>" />
-			</div>
-			</form>
-			<?php
 		} else { // $adddb === 'TRUE'
 			$re_id_attaches = $_POST["re_id_attaches"];
 			if (!empty($re_id_attaches)) {
@@ -207,6 +265,8 @@ class OrganizeMediaLibraryAdmin {
 				<div class="submit">
 				<form method="post" style="float: left;" action="<?php echo $scriptname; ?>">
 					<input type="hidden" name="organizemedialibrary-tabs" value="1" />
+					<input type="hidden" name="p" value="<?php echo $page; ?>" />
+					<input type="hidden" name="mime" value="<?php echo $mimefilter; ?>" />
 					<input type="submit" value="<?php _e('Back'); ?>" />
 				</form>
 				<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
@@ -277,6 +337,7 @@ class OrganizeMediaLibraryAdmin {
 			<div class="submit">
 			<form method="post" style="float: left;" action="<?php echo $scriptname; ?>">
 				<input type="hidden" name="organizemedialibrary-tabs" value="1" />
+				<input type="hidden" name="p" value="<?php echo $page; ?>" />
 				<input type="submit" value="<?php _e('Back'); ?>" />
 			</form>
 			<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
@@ -286,9 +347,9 @@ class OrganizeMediaLibraryAdmin {
 			<div style="clear:both"></div>
 			<?php
 		}
-		echo '</div>';
 
 		?>
+		</div>
 		</div>
 
 		<div id="organizemedialibrary-tabs-2">
@@ -339,6 +400,49 @@ class OrganizeMediaLibraryAdmin {
 	}
 
 	/* ==================================================
+	 * Pagenation
+	 * @since	1.7
+	 * string	$page
+	 * string	$pagebegin
+	 * string	$pageend
+	 * string	$pagelast
+	 * string	$scriptname
+	 * string	$mimefilter
+	 * return	$html
+	 */
+	function pagenation($page, $pagebegin, $pageend, $pagelast, $scriptname, $mimefilter){
+
+			$pageprev = $page - 1;
+			$pagenext = $page + 1;
+			$scriptnamefirst = add_query_arg( array('p' => '1', 'mime' => $mimefilter ),  $scriptname);
+			$scriptnameprev = add_query_arg( array('p' => $pageprev, 'mime' => $mimefilter ),  $scriptname);
+			$scriptnamenext = add_query_arg( array('p' => $pagenext, 'mime' => $mimefilter ),  $scriptname);
+			$scriptnamelast = add_query_arg( array('p' => $pagelast, 'mime' => $mimefilter ),  $scriptname);
+			?>
+			<div class="organizemedialibrary-pages">
+			<span class="organizemedialibrary-links">
+			<?php
+			if ( $page <> 1 ){
+				?><a title='<?php _e('Go to the first page'); ?>' href='<?php echo $scriptnamefirst; ?>'>&laquo;</a>
+				<a title='<?php _e('Go to the previous page'); ?>' href='<?php echo $scriptnameprev; ?>'>&lsaquo;</a>
+			<?php
+			}
+			echo $page; ?> / <?php echo $pagelast;
+			?>
+			<?php
+			if ( $page <> $pagelast ){
+				?><a title='<?php _e('Go to the next page'); ?>' href='<?php echo $scriptnamenext; ?>'>&rsaquo;</a>
+				<a title='<?php _e('Go to the last page'); ?>' href='<?php echo $scriptnamelast; ?>'>&raquo;</a>
+			<?php
+			}
+			?>
+			</span>
+			</div>
+			<?php
+
+	}
+
+	/* ==================================================
 	 * Update	wp_options table.
 	 * @param	string	$tabs
 	 * @since	1.0
@@ -349,7 +453,13 @@ class OrganizeMediaLibraryAdmin {
 
 		switch ($tabs) {
 			case 1:
+				if ( !empty($_POST['organizemedialibrary_pagemax']) ) {
+					$pagemax = intval($_POST['organizemedialibrary_pagemax']);
+				} else {
+					$pagemax = $organizemedialibrary_settings['pagemax'];
+				}
 				$organizemedialibrary_tbl = array(
+									'pagemax' => $pagemax,
 									'max_execution_time' => $organizemedialibrary_settings['max_execution_time']
 									);
 				update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
@@ -357,7 +467,8 @@ class OrganizeMediaLibraryAdmin {
 			case 2:
 				if ( !empty($_POST['organizemedialibrary_max_execution_time']) ) {
 					$organizemedialibrary_tbl = array(
-										'max_execution_time' => $_POST['organizemedialibrary_max_execution_time']
+										'pagemax' => $organizemedialibrary_settings['pagemax'],
+										'max_execution_time' => intval($_POST['organizemedialibrary_max_execution_time'])
 										);
 					update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
 					if ( !empty($_POST['move_yearmonth_folders']) ) {
