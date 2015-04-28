@@ -176,7 +176,7 @@ class OrganizeMediaLibraryAdmin {
 				</select>
 				<input type="submit" value="<?php _e('Filter'); ?>">
 			</form>
-			<div style="clear:both"></div>
+			<div style="clear: both;"></div>
 			<?php
 			if ( $pageallcount > 0 ) {
 				if ( $pagelast > 1 ) {
@@ -273,7 +273,7 @@ class OrganizeMediaLibraryAdmin {
 					<input type="submit" value="<?php _e('Media Library'); ?>" />
 				</form>
 				</div>
-				<div style="clear:both"></div>
+				<div style="clear: both;"></div>
 				<?php
 
 				$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
@@ -344,7 +344,7 @@ class OrganizeMediaLibraryAdmin {
 				<input type="submit" value="<?php _e('Media Library'); ?>" />
 			</form>
 			</div>
-			<div style="clear:both"></div>
+			<div style="clear: both;"></div>
 			<?php
 		}
 
@@ -356,27 +356,18 @@ class OrganizeMediaLibraryAdmin {
 		<div class="wrap">
 		<form method="post" action="<?php echo $scriptname; ?>">
 			<h3><?php _e('Settings'); ?></h3>
-			<div style="display:block;padding:5px 0">
+			<div style="display:block; padding:5px 5px">
 			<input type="checkbox" name="move_yearmonth_folders" value="1" <?php checked('1', get_option('uploads_use_yearmonth_folders')); ?> />
 			<?php _e('Organize my uploads into month- and year-based folders'); ?>
 			</div>
-			<div style="display:block;padding:5px 0">
+			<div style="display:block; padding:5px 5px">
 				<?php
-					$max_execution_time_text = __('Set the number of seconds a script is allowed to run.', 'organizemedialibrary').'('.__('The max_execution_time value defined in the php.ini.', 'organizemedialibrary').'[<font color="red">'.$def_max_execution_time.'</font>]'.')';
-					echo $max_execution_time_text;
-					$target_organizemedialibrary_max_execution_time = $organizemedialibrary_settings['max_execution_time'];
-				?>
-				<select id="organizemedialibrary_max_execution_time" name="organizemedialibrary_max_execution_time">
-					<option <?php if ('30' == $target_organizemedialibrary_max_execution_time)echo 'selected="selected"'; ?>>30</option>
-					<option <?php if ('60' == $target_organizemedialibrary_max_execution_time)echo 'selected="selected"'; ?>>60</option>
-					<option <?php if ('120' == $target_organizemedialibrary_max_execution_time)echo 'selected="selected"'; ?>>120</option>
-					<option <?php if ('180' == $target_organizemedialibrary_max_execution_time)echo 'selected="selected"'; ?>>180</option>
-					<option <?php if ('240' == $target_organizemedialibrary_max_execution_time)echo 'selected="selected"'; ?>>240</option>
-					<option <?php if ('300' == $target_organizemedialibrary_max_execution_time)echo 'selected="selected"'; ?>>300</option>
-					<option <?php if ('600' == $target_organizemedialibrary_max_execution_time)echo 'selected="selected"'; ?>>600</option>
-				</select>
+					$max_execution_time_text = __('The number of seconds a script is allowed to run.', 'organizemedialibrary').'('.__('The max_execution_time value defined in the php.ini.', 'organizemedialibrary').'[<font color="red">'.$def_max_execution_time.'</font>]'.')';
+					?>
+					<div style="float: left;"><?php echo $max_execution_time_text; ?>:<input type="text" name="organizemedialibrary_max_execution_time" value="<?php echo $organizemedialibrary_settings['max_execution_time']; ?>" size="3" /></div>
 			</div>
-			<div class="submit">
+			<div style="clear: both;"></div>
+			<div style="display:block; padding:5px 5px">
 				<input type="hidden" name="organizemedialibrary-tabs" value="2" />
 				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
 			</div>

@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, audios, gallery, thumbnails, uploads, images, media, media library, videos
 Requires at least: 3.6.0
 Tested up to: 4.2
-Stable tag: 1.7
+Stable tag: 1.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,6 +38,9 @@ none
 
 == Changelog ==
 
+= 1.8 =
+Fixed problem of max_execution_time.
+
 = 1.7 =
 Add pagination.
 Add mime types filter.
@@ -66,6 +69,7 @@ Change languages.
 
 == Upgrade Notice ==
 
+= 1.8 =
 = 1.7 =
 = 1.6 =
 = 1.5 =

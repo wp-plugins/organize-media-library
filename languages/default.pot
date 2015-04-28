@@ -28,7 +28,7 @@ msgstr ""
 msgid "Please make a donation if you like my work or would like to further the development of this plugin."
 msgstr ""
 
-msgid "Set the number of seconds a script is allowed to run."
+msgid "The number of seconds a script is allowed to run."
 msgstr ""
 
 msgid "The max_execution_time value defined in the php.ini."
