@@ -162,7 +162,7 @@ class OrganizeMediaLibraryAdmin {
 				<input type="hidden" name="organizemedialibrary-tabs" value="1" />
 				<input type="hidden" name="adddb" value="FALSE">
 				<div style="float:left;"><?php _e('Number of titles to show to this page', 'organizemedialibrary'); ?>:<input type="text" name="organizemedialibrary_pagemax" value="<?php echo $pagemax; ?>" size="3" /></div>
-				<input type="submit" name="ShowToPage" value="<?php _e('Save') ?>" />
+				<input type="submit" class="button" name="ShowToPage" value="<?php _e('Save') ?>" />
 				<span style="margin-right: 1em;"></span>
 				<select name="mime" style="width: 180px;">
 				<option value=""><?php echo esc_attr( __( 'All Mime types', 'postdatetimechange' ) ); ?></option> 
@@ -174,7 +174,7 @@ class OrganizeMediaLibraryAdmin {
 				}
 				?>
 				</select>
-				<input type="submit" value="<?php _e('Filter'); ?>">
+				<input type="submit" class="button" value="<?php _e('Filter'); ?>">
 			</form>
 			<div style="clear: both;"></div>
 			<?php
@@ -213,7 +213,8 @@ class OrganizeMediaLibraryAdmin {
 						$input_html = NULL;
 						$input_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
 						$input_html .= '<input name="re_id_attaches['.$this->postcount.'][id]" type="checkbox" value="'.$attach_id.'" class="group_organize-media-library" style="float: left; margin: 5px;">';
-						$input_html .= '<img width="40" height="40" src="'.$thumbnail_img_url.'">';
+						$input_html .= '<img width="40" height="40" src="'.$thumbnail_img_url.'" style="float: left; margin: 5px;">';
+						$input_html .= '<div style="overflow: hidden;">';
 						$input_html .= '<div>'.__('Title').': '.$title.'</div>';
 						$input_html .= '<div>'.__('Permalink:').' <a href="'.get_attachment_link($attach_id).'" target="_blank" style="text-decoration: none; word-break: break-all;">'.get_attachment_link($attach_id).'</a></div>';
 						$input_html .= '<div>URL: <a href="'.$url_attach.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$url_attach.'</a></div>';
@@ -235,7 +236,7 @@ class OrganizeMediaLibraryAdmin {
 							}
 						}
 
-						$input_html .= "</div>\n";
+						$input_html .= "</div></div>\n";
 
 						echo $input_html;
 
@@ -267,10 +268,10 @@ class OrganizeMediaLibraryAdmin {
 					<input type="hidden" name="organizemedialibrary-tabs" value="1" />
 					<input type="hidden" name="p" value="<?php echo $page; ?>" />
 					<input type="hidden" name="mime" value="<?php echo $mimefilter; ?>" />
-					<input type="submit" value="<?php _e('Back'); ?>" />
+					<input type="submit" class="button" value="<?php _e('Back'); ?>" />
 				</form>
 				<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
-					<input type="submit" value="<?php _e('Media Library'); ?>" />
+					<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
 				</form>
 				</div>
 				<div style="clear: both;"></div>
@@ -290,7 +291,8 @@ class OrganizeMediaLibraryAdmin {
 
 							$output_html = NULL;
 							$output_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
-							$output_html .= '<img width="40" height="40" src="'.$thumbnail_img_url.'">';
+							$output_html .= '<img width="40" height="40" src="'.$thumbnail_img_url.'" style="float: left; margin: 5px;">';
+							$output_html .= '<div style="overflow: hidden;">';
 							$output_html .= '<div>'.__('Title').': '.$new_attach_title.'</div>';
 							$output_html .= '<div>'.__('Permalink:').' <a href="'.get_attachment_link($re_id_attache).'" target="_blank" style="text-decoration: none; word-break: break-all;">'.get_attachment_link($re_id_attache).'</a></div>';
 							$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$new_url_attach.'</a></div>';
@@ -323,7 +325,7 @@ class OrganizeMediaLibraryAdmin {
 								$output_html .= '<div>'.__('Replaced URL:', 'organizemedialibrary').' '.$url_replace_contents.'</div>';
 							}
 
-							$output_html .= '</div>';
+							$output_html .= '</div></div>';
 
 							echo $output_html;
 
@@ -338,10 +340,10 @@ class OrganizeMediaLibraryAdmin {
 			<form method="post" style="float: left;" action="<?php echo $scriptname; ?>">
 				<input type="hidden" name="organizemedialibrary-tabs" value="1" />
 				<input type="hidden" name="p" value="<?php echo $page; ?>" />
-				<input type="submit" value="<?php _e('Back'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Back'); ?>" />
 			</form>
 			<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
-				<input type="submit" value="<?php _e('Media Library'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
 			</form>
 			</div>
 			<div style="clear: both;"></div>
@@ -369,7 +371,7 @@ class OrganizeMediaLibraryAdmin {
 			<div style="clear: both;"></div>
 			<div style="display:block; padding:5px 5px">
 				<input type="hidden" name="organizemedialibrary-tabs" value="2" />
-				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Save Changes'); ?>" />
 			</div>
 		</form>
 		</div>

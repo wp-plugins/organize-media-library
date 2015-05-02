@@ -107,7 +107,7 @@ class OrganizeMediaLibrary {
 
 		$filename = str_replace(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL.'/', '', $url_attach);
 
-		$postdategmt = $re_attache->post_modified_gmt;
+		$postdategmt = $re_attache->post_date_gmt;
 
 		// Move YearMonth Folders
 		if ( $yearmonth_folders == 1 ) {
