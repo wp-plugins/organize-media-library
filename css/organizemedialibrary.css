@@ -26,9 +26,6 @@
 	font-size: 14px;
 }
 
-#organizemedialibrary-loading-container {
-	display: none;
-}
 #organizemedialibrary-loading {
 	position: relative;
 	left: 40%;

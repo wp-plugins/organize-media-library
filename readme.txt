@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, audios, gallery, thumbnails, uploads, images, media, media library, videos
 Requires at least: 3.6.0
 Tested up to: 4.2
-Stable tag: 1.9
+Stable tag: 2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,6 +37,11 @@ none
 4. Settings
 
 == Changelog ==
+
+= 2.0 =
+Remove the unnecessary code.
+Fixed problem of database read.
+Fixed problem of display.
 
 = 1.9 =
 Fixed problem of get of the date and time.
@@ -73,6 +78,7 @@ Change languages.
 
 == Upgrade Notice ==
 
+= 2.0 =
 = 1.9 =
 = 1.8 =
 = 1.7 =

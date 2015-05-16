@@ -129,12 +129,18 @@ class OrganizeMediaLibraryAdmin {
 
 		<?php
 
-		$args = array(
-			'post_type' => 'attachment',
-			'post_mime_type' => $mimefilter,
-			'numberposts' => -1
-			);
-		$attachments = get_posts($args);
+		global $wpdb;
+		$postmimetype = NULL;
+		if ( !empty($mimefilter) ) {
+			$postmimetype = "and post_mime_type = '".$mimefilter."'";
+		}
+		$attachments = $wpdb->get_results("
+						SELECT	ID, post_title
+						FROM	$wpdb->posts
+						WHERE	post_type = 'attachment'
+								$postmimetype
+								ORDER BY post_date DESC
+						");
 
 		$pageallcount = 0;
 		// pagenation
@@ -208,7 +214,8 @@ class OrganizeMediaLibraryAdmin {
 						$exts = explode('.', $url_attach);
 						$ext = end($exts);
 
-						list($imagethumburls, $mimetype, $length, $thumbnail_img_url, $stamptime, $file_size, $filetype) = $organizemedialibrary->getmeta($ext, $attach_id);
+						$metadata = NULL;
+						list($imagethumburls, $mimetype, $length, $thumbnail_img_url, $stamptime, $file_size, $filetype) = $organizemedialibrary->getmeta($ext, $attach_id, $metadata);
 
 						$input_html = NULL;
 						$input_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
@@ -268,7 +275,7 @@ class OrganizeMediaLibraryAdmin {
 					<input type="hidden" name="organizemedialibrary-tabs" value="1" />
 					<input type="hidden" name="p" value="<?php echo $page; ?>" />
 					<input type="hidden" name="mime" value="<?php echo $mimefilter; ?>" />
-					<input type="submit" class="button" value="<?php _e('Back'); ?>" />
+					<input type="submit" class="button" value="<?php _e('Search'); ?>" />
 				</form>
 				<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
 					<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
@@ -285,9 +292,9 @@ class OrganizeMediaLibraryAdmin {
 							$re_id_attache = intval($postval1[$postkey2]);
 
 							// Rebuild
-							list($ext, $new_attach_title, $new_url_attach, $url_replace_contents) = $organizemedialibrary->regist($re_id_attache, $yearmonth_folders);
+							list($ext, $new_attach_title, $new_url_attach, $url_replace_contents, $metadata) = $organizemedialibrary->regist($re_id_attache, $yearmonth_folders);
 
-							list($imagethumburls, $mimetype, $length, $thumbnail_img_url, $stamptime, $file_size, $filetype) = $organizemedialibrary->getmeta($ext, $re_id_attache);
+							list($imagethumburls, $mimetype, $length, $thumbnail_img_url, $stamptime, $file_size, $filetype) = $organizemedialibrary->getmeta($ext, $re_id_attache, $metadata);
 
 							$output_html = NULL;
 							$output_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
@@ -298,28 +305,19 @@ class OrganizeMediaLibraryAdmin {
 							$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$new_url_attach.'</a></div>';
 							$re_id_attaches = explode('/', $new_url_attach);
 							$output_html .= '<div>'.__('File name:').' '.end($re_id_attaches).'</div>';
-
+							$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 							if ( wp_ext2type($ext) === 'image' ) {
-								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 								$output_html .= '<div>'.__('Images').': ';
 								foreach ( $imagethumburls as $thumbsize => $imagethumburl ) {
 									$output_html .= '[<a href="'.$imagethumburl.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$thumbsize.'</a>]';
 								}
 								$output_html .= '</div>';
-							} else if ( wp_ext2type($ext) === 'video' ) {
-								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
-								$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
-								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
-								$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
-							} else if ( wp_ext2type($ext) === 'audio' ) {
-								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
-								$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
-								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
-								$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
 							} else {
-								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 								$output_html .= '<div>'.__('File type:').' '.$filetype.'</div>';
 								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
+								if ( wp_ext2type($ext) === 'video' ||  wp_ext2type($ext) === 'audio' ) {
+									$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
+								}
 							}
 							if ( !empty($url_replace_contents) ) {
 								$output_html .= '<div>'.__('Replaced URL:', 'organizemedialibrary').' '.$url_replace_contents.'</div>';
@@ -340,7 +338,7 @@ class OrganizeMediaLibraryAdmin {
 			<form method="post" style="float: left;" action="<?php echo $scriptname; ?>">
 				<input type="hidden" name="organizemedialibrary-tabs" value="1" />
 				<input type="hidden" name="p" value="<?php echo $page; ?>" />
-				<input type="submit" class="button" value="<?php _e('Back'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Search'); ?>" />
 			</form>
 			<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
 				<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
