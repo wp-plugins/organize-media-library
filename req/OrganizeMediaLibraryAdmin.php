@@ -33,7 +33,9 @@ class OrganizeMediaLibraryAdmin {
 			$this_plugin = ORGANIZEMEDIALIBRARY_PLUGIN_BASE_FILE;
 		}
 		if ( $file == $this_plugin ) {
-			$links[] = '<a href="'.admin_url('tools.php?page=organizemedialibrary').'">'.__( 'Settings').'</a>';
+			$links[] = '<a href="'.admin_url('admin.php?page=organizemedialibrary').'">Organize Media Library</a>';
+			$links[] = '<a href="'.admin_url('admin.php?page=organizemedialibrary-settings').'">'.__( 'Settings').'</a>';
+			$links[] = '<a href="'.admin_url('admin.php?page=organizemedialibrary-search-register').'">'.__('Search & Rebuild & Organize', 'organizemedialibrary').'</a>';
 		}
 			return $links;
 	}
@@ -43,7 +45,29 @@ class OrganizeMediaLibraryAdmin {
 	 * @since	1.0
 	 */
 	function add_pages() {
-		add_management_page('Organize Media Library', 'Organize Media Library', 'manage_options', 'organizemedialibrary', array($this, 'manage_page'));
+		add_menu_page(
+				'Organize Media Library',
+				'Organize Media Library',
+				'manage_options',
+				'organizemedialibrary',
+				array($this, 'manage_page')
+		);
+		add_submenu_page(
+				'organizemedialibrary',
+				__('Settings'),
+				__('Settings'),
+				'manage_options',
+				'organizemedialibrary-settings',
+				array($this, 'settings_page')
+		);
+		add_submenu_page(
+				'organizemedialibrary',
+				__('Search & Rebuild & Organize', 'organizemedialibrary'),
+				__('Search & Rebuild & Organize', 'organizemedialibrary'),
+				'manage_options',
+				'organizemedialibrary-search-register',
+				array($this, 'search_register_page')
+		);
 	}
 
 	/* ==================================================
@@ -51,12 +75,8 @@ class OrganizeMediaLibraryAdmin {
 	 * @since	2.23
 	 */
 	function load_custom_wp_admin_style() {
-		wp_enqueue_style( 'jquery-responsiveTabs', ORGANIZEMEDIALIBRARY_PLUGIN_URL.'/css/responsive-tabs.css' );
-		wp_enqueue_style( 'jquery-responsiveTabs-style', ORGANIZEMEDIALIBRARY_PLUGIN_URL.'/css/style.css' );
 		wp_enqueue_style( 'organizemedialibrary',  ORGANIZEMEDIALIBRARY_PLUGIN_URL.'/css/organizemedialibrary.css' );
 		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'jquery-responsiveTabs', ORGANIZEMEDIALIBRARY_PLUGIN_URL.'/js/jquery.responsiveTabs.min.js' );
-
 	}
 
 	/* ==================================================
@@ -72,24 +92,144 @@ class OrganizeMediaLibraryAdmin {
 	 */
 	function manage_page() {
 
-		$def_max_execution_time = ini_get('max_execution_time');
+		if ( !current_user_can( 'manage_options' ) )  {
+			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+		}
+
+		$plugin_datas = get_file_data( ORGANIZEMEDIALIBRARY_PLUGIN_BASE_DIR.'/organizemedialibrary.php', array('version' => 'Version') );
+		$plugin_version = __('Version:').' '.$plugin_datas['version'];
+
+		?>
+
+		<div class="wrap">
+
+		<h2 style="float: left;">Organize Media Library</h2>
+		<div style="display: block; padding: 10px 10px;">
+			<form method="post" style="float: left; margin-right: 1em;" action="<?php echo admin_url('admin.php?page=organizemedialibrary-settings'); ?>">
+				<input type="submit" class="button" value="<?php _e('Settings'); ?>" />
+			</form>
+			<form method="post" action="<?php echo admin_url('admin.php?page=organizemedialibrary-search-register'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Search & Rebuild & Organize', 'organizemedialibrary'); ?>" />
+			</form>
+		</div>
+		<div style="clear: both;"></div>
+
+		<h3><?php _e('Thumbnails rebuild and organize uploads into month- and year-based folders or specified folders. URL in the content, replace with the new URL.', 'organizemedialibrary'); ?></h3>
+		<h4 style="margin: 5px; padding: 5px;">
+		<?php echo $plugin_version; ?> |
+		<a style="text-decoration: none;" href="https://wordpress.org/support/plugin/organize-media-library" target="_blank"><?php _e('Support Forums') ?></a> |
+		<a style="text-decoration: none;" href="https://wordpress.org/support/view/plugin-reviews/organize-media-library" target="_blank"><?php _e('Reviews', 'organizemedialibrary') ?></a>
+		</h4>
+
+		<div style="width: 250px; height: 170px; margin: 5px; padding: 5px; border: #CCC 2px solid;">
+		<h3><?php _e('Please make a donation if you like my work or would like to further the development of this plugin.', 'organizemedialibrary'); ?></h3>
+		<div style="text-align: right; margin: 5px; padding: 5px;"><span style="padding: 3px; color: #ffffff; background-color: #008000">Plugin Author</span> <span style="font-weight: bold;">Katsushi Kawamori</span></div>
+<a style="margin: 5px; padding: 5px;" href='https://pledgie.com/campaigns/28307' target="_blank"><img alt='Click here to lend your support to: Various Plugins for WordPress and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/28307.png?skin_name=chrome' border='0' ></a>
+		</div>
+
+		</div>
+		<?php
+	}
+
+	/* ==================================================
+	 * Sub Menu
+	 */
+	function settings_page() {
 
 		if ( !current_user_can( 'manage_options' ) )  {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
 
-		if ( empty($_POST['organizemedialibrary-tabs']) ) {
-			$tabs = 1;
-		} else {
-			$tabs = intval($_POST['organizemedialibrary-tabs']);
+		$submenu = 1;
+		$this->options_updated($submenu);
+
+		include_once ORGANIZEMEDIALIBRARY_PLUGIN_BASE_DIR.'/inc/OrganizeMediaLibrary.php';
+		$organizemedialibrary = new OrganizeMediaLibrary();
+		$organizemedialibrary_settings = get_option('organizemedialibrary_settings');
+		$targetdir = $organizemedialibrary_settings['targetdir'];
+		$def_max_execution_time = ini_get('max_execution_time');
+		$scriptname = admin_url('admin.php?page=organizemedialibrary-settings');
+
+		?>
+		<div class="wrap">
+
+		<h2>Organize Media Library <?php _e('Settings'); ?>
+			<form method="post" style="float: right;" action="<?php echo admin_url('admin.php?page=organizemedialibrary-search-register'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Search & Rebuild & Organize', 'organizemedialibrary'); ?>" />
+			</form>
+		</h2>
+		<div style="clear: both;"></div>
+
+		<form method="post" action="<?php echo $scriptname; ?>">
+			<div class="item-organizemedialibrary-settings">
+				<div style="display: block; padding:5px 5px">
+					<h3><?php _e('Execution time', 'organizemedialibrary'); ?></h3>
+					<?php
+						$max_execution_time_text = __('The number of seconds a script is allowed to run.', 'organizemedialibrary').'('.__('The max_execution_time value defined in the php.ini.', 'organizemedialibrary').'[<font color="red">'.$def_max_execution_time.'</font>]'.')';
+						?>
+						<div style="float: left;"><?php echo $max_execution_time_text; ?>:<input type="text" name="organizemedialibrary_max_execution_time" value="<?php echo $organizemedialibrary_settings['max_execution_time']; ?>" size="3" /></div>
+				</div>
+				<div style="clear: both;"></div>
+			</div>
+			<div class="item-organizemedialibrary-settings">
+				<h3><?php _e('Folder Settings', 'organizemedialibrary'); ?></h3>
+				<div style="display: block; padding:5px 5px;">
+				<input type="radio" name="organizemedialibrary_folderset" value="rebuildonly" <?php if ($organizemedialibrary_settings['folderset'] === 'rebuildonly') echo 'checked'; ?>>
+				<?php _e('Only rebuild of metadata.', 'organizemedialibrary'); ?>
+				</div>
+				<div style="display: block; padding:5px 5px;">
+				<input type="radio" name="organizemedialibrary_folderset" value="movefolder" <?php if ($organizemedialibrary_settings['folderset'] === 'movefolder') echo 'checked'; ?>>
+				<?php _e('Organize files into a folder.', 'organizemedialibrary'); ?>
+				</div>
+				<div style="display: block;padding:5px 20px;">
+				<input type="checkbox" name="move_yearmonth_folders" value="1" <?php checked('1', get_option('uploads_use_yearmonth_folders')); ?> />
+				<?php _e('Organize my uploads into month- and year-based folders'); ?>
+				</div>
+				<?php
+				$disable_form = NULL;
+				if ( get_option('uploads_use_yearmonth_folders') === '1' ){
+					$disable_form = 'disabled="disabled"';
+				}
+				?>
+				<div style="display: block; padding:5px 20px;">
+					<?php _e('Select a folder to organize', 'organizemedialibrary'); ?>
+					<select <?php echo $disable_form; ?> name="targetdir" style="width: 250px;">
+					<?php echo $organizemedialibrary->dir_selectbox($targetdir); ?>
+					</select>
+				</div>
+				<div style="display: block; padding:5px 40px;">
+					<?php _e('Make folder', 'organizemedialibrary'); ?><input <?php echo $disable_form; ?> type="text" name="newdir">
+				</div>
+				<div style="clear: both;"></div>
+			</div>
+			<div class="submit">
+				<input type="submit" class="button" value="<?php _e('Save Changes'); ?>" />
+			</div>
+		</form>
+		</div>
+		<?php
+	}
+
+	/* ==================================================
+	 * Sub Menu
+	 */
+	function search_register_page() {
+
+		if ( !current_user_can( 'manage_options' ) )  {
+			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
 
-		$this->options_updated($tabs);
+		$def_max_execution_time = ini_get('max_execution_time');
+
+		$submenu = 2;
+		$this->options_updated($submenu);
 
 		include_once ORGANIZEMEDIALIBRARY_PLUGIN_BASE_DIR.'/inc/OrganizeMediaLibrary.php';
 		$organizemedialibrary = new OrganizeMediaLibrary();
 		$organizemedialibrary_settings = get_option('organizemedialibrary_settings');
 		$pagemax = $organizemedialibrary_settings['pagemax'];
+		$folderset = $organizemedialibrary_settings['folderset'];
+		$target_folder = $organizemedialibrary_settings['targetdir'];
 		$max_execution_time = $organizemedialibrary_settings['max_execution_time'];
 
 		set_time_limit($max_execution_time);
@@ -107,22 +247,36 @@ class OrganizeMediaLibraryAdmin {
 			$mimefilter = $_POST['mime'];
 		}
 
-		$scriptname = admin_url('tools.php?page=organizemedialibrary');
+		$searchdir = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH;
+		if (!empty($_POST['searchdir'])){
+			$searchdir = urldecode($_POST['searchdir']);
+		}
+
+		if( get_option('WPLANG') === 'ja' ) {
+			mb_language('Japanese');
+		} else if( get_option('WPLANG') === 'en' ) {
+			mb_language('English');
+		} else {
+			mb_language('uni');
+		}
+
+		if (DIRECTORY_SEPARATOR === '\\' && mb_language() === 'Japanese') {
+			$searchdir = mb_convert_encoding($searchdir, "sjis-win", "auto");
+		} else {
+			$searchdir = mb_convert_encoding($searchdir, "UTF-8", "auto");
+		}
+
+		$scriptname = admin_url('admin.php?page=organizemedialibrary-search-register');
 
 		?>
 		<div class="wrap">
 
-		<h2>Organize Media Library</h2>
-
-			<div id="organizemedialibrary-tabs">
-				<ul>
-				<li><a href="#organizemedialibrary-tabs-1"><?php _e('Search & Rebuild & Organize', 'organizemedialibrary'); ?></a></li>
-				<li><a href="#organizemedialibrary-tabs-2"><?php _e('Settings'); ?></a></li>
-				<li><a href="#organizemedialibrary-tabs-3"><?php _e('Donate to this plugin &#187;'); ?></a></li>
-				</ul>
-				<div id="organizemedialibrary-tabs-1">
-
-		<h3><?php _e('Thumbnails rebuild and organize uploads into month- and year-based folders. URL in the content, replace with the new URL.', 'organizemedialibrary'); ?></h3>
+		<h2>Organize Media Library <?php _e('Search & Rebuild & Organize', 'organizemedialibrary'); ?>
+			<form method="post" style="float: right;" action="<?php echo admin_url('admin.php?page=organizemedialibrary-settings'); ?>">
+				<input type="submit" class="button" value="<?php _e('Settings'); ?>" />
+			</form>
+		</h2>
+		<div style="clear: both;"></div>
 
 		<div id="organizemedialibrary-loading"><img src="<?php echo ORGANIZEMEDIALIBRARY_PLUGIN_URL; ?>/css/loading.gif"></div>
 		<div id="organizemedialibrary-loading-container">
@@ -138,6 +292,7 @@ class OrganizeMediaLibraryAdmin {
 						SELECT	ID, post_title
 						FROM	$wpdb->posts
 						WHERE	post_type = 'attachment'
+								and guid LIKE '%%$searchdir%%'
 								$postmimetype
 								ORDER BY post_date DESC
 						");
@@ -165,22 +320,26 @@ class OrganizeMediaLibraryAdmin {
 		if ( $adddb <> 'TRUE' ) {
 			?>
 			<form method="post" action="<?php echo $scriptname; ?>">
-				<input type="hidden" name="organizemedialibrary-tabs" value="1" />
 				<input type="hidden" name="adddb" value="FALSE">
-				<div style="float:left;"><?php _e('Number of titles to show to this page', 'organizemedialibrary'); ?>:<input type="text" name="organizemedialibrary_pagemax" value="<?php echo $pagemax; ?>" size="3" /></div>
+				<div style="float:left;"><?php _e('Number of items per page:'); ?><input type="text" name="organizemedialibrary_pagemax" value="<?php echo $pagemax; ?>" size="3" /></div>
 				<input type="submit" class="button" name="ShowToPage" value="<?php _e('Save') ?>" />
-				<span style="margin-right: 1em;"></span>
-				<select name="mime" style="width: 180px;">
-				<option value=""><?php echo esc_attr( __( 'All Mime types', 'postdatetimechange' ) ); ?></option> 
-				<?php
-				foreach ( wp_get_mime_types() as $exts => $mime ) {
-					?>
-					<option value="<?php echo esc_attr($mime); ?>"<?php if ($mimefilter === $mime) echo ' selected';?>><?php echo esc_attr($mime); ?></option>
+				<div style="clear: both;"></div>
+				<div>
+					<select name="searchdir" style="width: 250px;">
+					<?php echo $organizemedialibrary->dir_selectbox($searchdir); ?>
+					</select>
+					<select name="mime" style="width: 180px;">
+					<option value=""><?php echo esc_attr( __( 'All Mime types', 'organizemedialibrary' ) ); ?></option>
 					<?php
-				}
-				?>
-				</select>
-				<input type="submit" class="button" value="<?php _e('Filter'); ?>">
+					foreach ( wp_get_mime_types() as $exts => $mime ) {
+						?>
+						<option value="<?php echo esc_attr($mime); ?>"<?php if ($mimefilter === $mime) echo ' selected';?>><?php echo esc_attr($mime); ?></option>
+						<?php
+					}
+					?>
+					</select>
+					<input type="submit" class="button" value="<?php _e('Filter'); ?>">
+				</div>
 			</form>
 			<div style="clear: both;"></div>
 			<?php
@@ -190,7 +349,6 @@ class OrganizeMediaLibraryAdmin {
 				}
 				?>
 				<form method="post" action="<?php echo $scriptname; ?>">
-					<input type="hidden" name="organizemedialibrary-tabs" value="1" />
 					<input type="hidden" name="adddb" value="TRUE">
 					<input type="hidden" name="p" value="<?php echo $page; ?>" />
 					<input type="hidden" name="mime" value="<?php echo $mimefilter; ?>" />
@@ -215,7 +373,7 @@ class OrganizeMediaLibraryAdmin {
 						$ext = end($exts);
 
 						$metadata = NULL;
-						list($imagethumburls, $mimetype, $length, $thumbnail_img_url, $stamptime, $file_size, $filetype) = $organizemedialibrary->getmeta($ext, $attach_id, $metadata);
+						list($imagethumburls, $mimetype, $length, $thumbnail_img_url, $stamptime, $file_size) = $organizemedialibrary->getmeta($ext, $attach_id, $metadata);
 
 						$input_html = NULL;
 						$input_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
@@ -236,7 +394,7 @@ class OrganizeMediaLibraryAdmin {
 							}
 							$input_html .= '</div>';
 						} else {
-							$input_html .= '<div>'.__('File type:').' '.$filetype.'</div>';
+							$input_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
 							$input_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
 							if ( wp_ext2type($ext) === 'video' || wp_ext2type($ext) === 'audio' ) {
 								$input_html .= '<div>'.__('Length:').' '.$length.'</div>';
@@ -272,7 +430,6 @@ class OrganizeMediaLibraryAdmin {
 				?>
 				<div class="submit">
 				<form method="post" style="float: left;" action="<?php echo $scriptname; ?>">
-					<input type="hidden" name="organizemedialibrary-tabs" value="1" />
 					<input type="hidden" name="p" value="<?php echo $page; ?>" />
 					<input type="hidden" name="mime" value="<?php echo $mimefilter; ?>" />
 					<input type="submit" class="button" value="<?php _e('Search'); ?>" />
@@ -292,9 +449,9 @@ class OrganizeMediaLibraryAdmin {
 							$re_id_attache = intval($postval1[$postkey2]);
 
 							// Rebuild
-							list($ext, $new_attach_title, $new_url_attach, $url_replace_contents, $metadata) = $organizemedialibrary->regist($re_id_attache, $yearmonth_folders);
+							list($ext, $new_attach_title, $new_url_attach, $url_replace_contents, $metadata) = $organizemedialibrary->regist($re_id_attache, $yearmonth_folders, $folderset, $target_folder);
 
-							list($imagethumburls, $mimetype, $length, $thumbnail_img_url, $stamptime, $file_size, $filetype) = $organizemedialibrary->getmeta($ext, $re_id_attache, $metadata);
+							list($imagethumburls, $mimetype, $length, $thumbnail_img_url, $stamptime, $file_size) = $organizemedialibrary->getmeta($ext, $re_id_attache, $metadata);
 
 							$output_html = NULL;
 							$output_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
@@ -313,7 +470,7 @@ class OrganizeMediaLibraryAdmin {
 								}
 								$output_html .= '</div>';
 							} else {
-								$output_html .= '<div>'.__('File type:').' '.$filetype.'</div>';
+								$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
 								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
 								if ( wp_ext2type($ext) === 'video' ||  wp_ext2type($ext) === 'audio' ) {
 									$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
@@ -336,7 +493,6 @@ class OrganizeMediaLibraryAdmin {
 			?>
 			<div class="submit">
 			<form method="post" style="float: left;" action="<?php echo $scriptname; ?>">
-				<input type="hidden" name="organizemedialibrary-tabs" value="1" />
 				<input type="hidden" name="p" value="<?php echo $page; ?>" />
 				<input type="submit" class="button" value="<?php _e('Search'); ?>" />
 			</form>
@@ -352,42 +508,7 @@ class OrganizeMediaLibraryAdmin {
 		</div>
 		</div>
 
-		<div id="organizemedialibrary-tabs-2">
-		<div class="wrap">
-		<form method="post" action="<?php echo $scriptname; ?>">
-			<h3><?php _e('Settings'); ?></h3>
-			<div style="display:block; padding:5px 5px">
-			<input type="checkbox" name="move_yearmonth_folders" value="1" <?php checked('1', get_option('uploads_use_yearmonth_folders')); ?> />
-			<?php _e('Organize my uploads into month- and year-based folders'); ?>
-			</div>
-			<div style="display:block; padding:5px 5px">
-				<?php
-					$max_execution_time_text = __('The number of seconds a script is allowed to run.', 'organizemedialibrary').'('.__('The max_execution_time value defined in the php.ini.', 'organizemedialibrary').'[<font color="red">'.$def_max_execution_time.'</font>]'.')';
-					?>
-					<div style="float: left;"><?php echo $max_execution_time_text; ?>:<input type="text" name="organizemedialibrary_max_execution_time" value="<?php echo $organizemedialibrary_settings['max_execution_time']; ?>" size="3" /></div>
-			</div>
-			<div style="clear: both;"></div>
-			<div style="display:block; padding:5px 5px">
-				<input type="hidden" name="organizemedialibrary-tabs" value="2" />
-				<input type="submit" class="button" value="<?php _e('Save Changes'); ?>" />
-			</div>
-		</form>
-		</div>
-		</div>
-
-		<div id="organizemedialibrary-tabs-3">
-		<div class="wrap">
-			<h3><?php _e('Please make a donation if you like my work or would like to further the development of this plugin.', 'organizemedialibrary'); ?></h3>
-			<div align="right">Katsushi Kawamori</div>
-			<h3 style="float: left;"><?php _e('Donate to this plugin &#187;'); ?></h3>
-<a href='https://pledgie.com/campaigns/28307' target="_blank"><img alt='Click here to lend your support to: Various Plugins for WordPress and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/28307.png?skin_name=chrome' border='0' ></a>
-		</div>
-		</div>
-
-		</div>
-		</div>
 		<?php
-
 	}
 
 	/* ==================================================
@@ -435,31 +556,53 @@ class OrganizeMediaLibraryAdmin {
 
 	/* ==================================================
 	 * Update	wp_options table.
-	 * @param	string	$tabs
+	 * @param	string	$submenu
 	 * @since	1.0
 	 */
-	function options_updated($tabs){
+	function options_updated($submenu){
 
 		$organizemedialibrary_settings = get_option('organizemedialibrary_settings');
 
-		switch ($tabs) {
+		switch ($submenu) {
 			case 1:
-				if ( !empty($_POST['organizemedialibrary_pagemax']) ) {
-					$pagemax = intval($_POST['organizemedialibrary_pagemax']);
-				} else {
-					$pagemax = $organizemedialibrary_settings['pagemax'];
-				}
-				$organizemedialibrary_tbl = array(
-									'pagemax' => $pagemax,
-									'max_execution_time' => $organizemedialibrary_settings['max_execution_time']
-									);
-				update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
-				break;
-			case 2:
-				if ( !empty($_POST['organizemedialibrary_max_execution_time']) ) {
+				if ( !empty($_POST['organizemedialibrary_folderset']) ) {
+					$folderset = $_POST['organizemedialibrary_folderset'];
+					if (!empty($_POST['targetdir'])){
+						$targetdir = urldecode($_POST['targetdir']);
+						if( get_option('WPLANG') === 'ja' ) {
+							mb_language('Japanese');
+						} else if( get_option('WPLANG') === 'en' ) {
+							mb_language('English');
+						} else {
+							mb_language('uni');
+						}
+						$newdir = NULL;
+						if (!empty($_POST['newdir'])){
+							$newdir = urldecode($_POST['newdir']);
+							$targetdir = $targetdir.'/'.$newdir;
+							if (DIRECTORY_SEPARATOR === '\\' && mb_language() === 'Japanese') {
+								$mkdir_targetdir = mb_convert_encoding($targetdir, "sjis-win", "auto");
+							} else {
+								$mkdir_targetdir = mb_convert_encoding($targetdir, "UTF-8", "auto");
+							}
+							if ( !file_exists(ABSPATH.$targetdir) ) {
+								mkdir(ABSPATH.$mkdir_targetdir, 0757, true);
+							}
+							$targetdir = mb_convert_encoding($targetdir, "UTF-8", "auto");
+						}
+					} else {
+						$targetdir = $organizemedialibrary_settings['targetdir'];
+					}
+					if ( !empty($_POST['organizemedialibrary_max_execution_time']) ) {
+						$max_execution_time = intval($_POST['organizemedialibrary_max_execution_time']);
+					} else {
+						$max_execution_time = $organizemedialibrary_settings['max_execution_time'];
+					}
 					$organizemedialibrary_tbl = array(
 										'pagemax' => $organizemedialibrary_settings['pagemax'],
-										'max_execution_time' => intval($_POST['organizemedialibrary_max_execution_time'])
+										'folderset' => $folderset,
+										'targetdir' => $targetdir,
+										'max_execution_time' => $max_execution_time
 										);
 					update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
 					if ( !empty($_POST['move_yearmonth_folders']) ) {
@@ -469,6 +612,20 @@ class OrganizeMediaLibraryAdmin {
 					}
 					echo '<div class="updated"><ul><li>'.__('Settings').' --> '.__('Changes saved.').'</li></ul></div>';
 				}
+				break;
+			case 2:
+				if ( !empty($_POST['organizemedialibrary_pagemax']) ) {
+					$pagemax = intval($_POST['organizemedialibrary_pagemax']);
+				} else {
+					$pagemax = $organizemedialibrary_settings['pagemax'];
+				}
+				$organizemedialibrary_tbl = array(
+									'pagemax' => $pagemax,
+									'folderset' => $organizemedialibrary_settings['folderset'],
+									'targetdir' => $organizemedialibrary_settings['targetdir'],
+									'max_execution_time' => $organizemedialibrary_settings['max_execution_time']
+									);
+				update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
 				break;
 		}
 

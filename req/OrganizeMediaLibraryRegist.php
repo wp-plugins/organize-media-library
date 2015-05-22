@@ -33,6 +33,8 @@ class OrganizeMediaLibraryRegist {
 		if ( !get_option('organizemedialibrary_settings') ) {
 			$organizemedialibrary_tbl = array(
 								'pagemax' => 20,
+								'folderset' => 'movefolder',
+								'targetdir' => ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH,
 								'max_execution_time' => 300
 							);
 			update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
@@ -43,7 +45,7 @@ class OrganizeMediaLibraryRegist {
 									'max_execution_time' => $organizemedialibrary_settings['max_execution_time']
 								);
 				update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
-			} else if ( $plugin_version >= 1.7 ) {
+			} else if ( $plugin_version >= 1.7 && $plugin_version < 3.0 ) {
 				if ( array_key_exists( "pagemax", $organizemedialibrary_settings ) ) {
 					$pagemax = $organizemedialibrary_settings['pagemax'];
 				} else {
@@ -51,6 +53,24 @@ class OrganizeMediaLibraryRegist {
 				}
 				$organizemedialibrary_tbl = array(
 									'pagemax' => $pagemax,
+									'max_execution_time' => $organizemedialibrary_settings['max_execution_time']
+								);
+				update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
+			} else if ( $plugin_version >= 3.0 ) {
+				if ( array_key_exists( "folderset", $organizemedialibrary_settings ) ) {
+					$folderset = $organizemedialibrary_settings['folderset'];
+				} else {
+					$folderset = 'movefolder';
+				}
+				if ( array_key_exists( "targetdir", $organizemedialibrary_settings ) ) {
+					$targetdir = $organizemedialibrary_settings['targetdir'];
+				} else {
+					$targetdir = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH;
+				}
+				$organizemedialibrary_tbl = array(
+									'pagemax' => $organizemedialibrary_settings['pagemax'],
+									'folderset' => $folderset,
+									'targetdir' => $targetdir,
 									'max_execution_time' => $organizemedialibrary_settings['max_execution_time']
 								);
 				update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );

@@ -13,9 +13,7 @@ msgstr ""
 msgid "Search & Rebuild & Organize"
 msgstr ""
 
-msgid ""
-"Thumbnails rebuild and organize uploads into month- and year-based folders. URL in the content, replace with the new URL."
-msgstr ""
+msgid "Thumbnails rebuild and organize uploads into month- and year-based folders or specified folders. URL in the content, replace with the new URL."
 
 msgid "The following media has been rebuild organize."
 msgstr ""
@@ -37,5 +35,23 @@ msgstr ""
 msgid "Replaced URL:"
 msgstr ""
 
-msgid "Number of titles to show to this page"
+msgid "All Mime types"
+msgstr ""
+
+msgid "Execution time"
+msgstr ""
+
+msgid "Folder Settings"
+msgstr ""
+
+msgid "Select a folder to organize"
+msgstr ""
+
+msgid "Make folder"
+msgstr ""
+
+msgid "Only rebuild of metadata."
+msgstr ""
+
+msgid "Organize files into a folder."
 msgstr ""

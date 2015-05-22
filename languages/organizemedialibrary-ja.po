@@ -15,11 +15,11 @@ msgid "Search & Rebuild & Organize"
 msgstr "検索＆再構築＆整理"
 
 msgid ""
-"Thumbnails rebuild and organize uploads into month- and year-based folders. "
-"URL in the content, replace with the new URL."
+"Thumbnails rebuild and organize uploads into month- and year-based folders "
+"or specified folders. URL in the content, replace with the new URL."
 msgstr ""
-"サムネイルを再構築し、年月ベースのフォルダに整理します。コンテンツ内のURLは、"
-"新しいURLで置き換えます。"
+"サムネイルを再構築し、年月ベースのフォルダあるいは指定したフォルダに整理しま"
+"す。コンテンツ内のURLは、新しいURLで置き換えます。"
 
 msgid "The following media has been rebuild organize."
 msgstr "以下のメディアは、整理・再構築されています。"
@@ -45,5 +45,23 @@ msgstr "php.iniで定義されたmax_execution_timeの値。"
 msgid "Replaced URL:"
 msgstr "置換URL:"
 
-msgid "Number of titles to show to this page"
-msgstr "このページへ表示数するタイトルの数"
+msgid "All Mime types"
+msgstr "すべてのMIMEタイプ"
+
+msgid "Execution time"
+msgstr "実行時間"
+
+msgid "Folder Settings"
+msgstr "フォルダの設定"
+
+msgid "Select a folder to organize"
+msgstr "整理するフォルダを選択"
+
+msgid "Make folder"
+msgstr "フォルダを作成"
+
+msgid "Only rebuild of metadata."
+msgstr "メタデータのみの再構築。"
+
+msgid "Organize files into a folder."
+msgstr "フォルダにファイルを整理します。"

@@ -4,16 +4,17 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, audios, gallery, thumbnails, uploads, images, media, media library, videos
 Requires at least: 3.6.0
 Tested up to: 4.2
-Stable tag: 2.0
+Stable tag: 3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Thumbnails rebuild and organize uploads into month- and year-based folders. URL in the content, replace with the new URL.
+Thumbnails rebuild and organize uploads into month- and year-based folders or specified folders. URL in the content, replace with the new URL.
 
 == Description ==
 
 * This rebuild a thumbnail of the image file.
 * Organize uploads into month- and year-based folders.
+* Organize files into the specified folder.
 * This rebuild a metadata(Images, Videos, Audios).
 * URL in the content, replace with the new URL.
 
@@ -37,6 +38,10 @@ none
 4. Settings
 
 == Changelog ==
+
+= 3.0 =
+Organize files into the specified folder.
+Separate the Search & Rebuild & Organaize page and Settings page. 
 
 = 2.0 =
 Remove the unnecessary code.
@@ -78,6 +83,7 @@ Change languages.
 
 == Upgrade Notice ==
 
+= 3.0 =
 = 2.0 =
 = 1.9 =
 = 1.8 =

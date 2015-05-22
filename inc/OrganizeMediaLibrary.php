@@ -25,7 +25,7 @@ class OrganizeMediaLibrary {
 	 * @param	string	$ext
 	 * @param	int		$attach_id
 	 * @param	array	$metadata
-	 * @return	array	$imagethumburls(array), $mimetype(string), $length(string), $thumbnail_img_url(string), $stamptime(string), $file_size(string), $filetype(string)
+	 * @return	array	$imagethumburls(array), $mimetype(string), $length(string), $thumbnail_img_url(string), $stamptime(string), $file_size(string)
 	 * @since	1.0
 	 */
 	function getmeta($ext, $attach_id, $metadata){
@@ -73,6 +73,8 @@ class OrganizeMediaLibrary {
 			}
 		} else {
 			$metadata = NULL;
+			$filetype = wp_check_filetype( get_attached_file($attach_id) );
+			$mimetype =  $filetype['ext'].'('.$filetype['type'].')';
 		}
 
 		$image_attr_thumbnail = wp_get_attachment_image_src($attach_id, 'thumbnail', true);
@@ -84,19 +86,20 @@ class OrganizeMediaLibrary {
 		} else {
 			$file_size = @filesize( get_attached_file($attach_id) );
 		}
-		$filetype = strtoupper($ext);
 
-		return array($imagethumburls, $mimetype, $length, $thumbnail_img_url, $stamptime, $file_size, $filetype);
+		return array($imagethumburls, $mimetype, $length, $thumbnail_img_url, $stamptime, $file_size);
 
 	}
 
 	/* ==================================================
 	 * @param	int		$re_id_attache
 	 * @param	bool	$yearmonth_folders
+	 * @param	string	$folderset
+	 * @param	string	$target_folder
 	 * @return	array	$ext(string), $new_attach_title(string), $new_url_attach(string), $url_replace_contents(string), $metadata(array)
 	 * @since	1.0
 	 */
-	function regist($re_id_attache, $yearmonth_folders){
+	function regist($re_id_attache, $yearmonth_folders, $folderset, $target_folder){
 
 		$re_attache = get_post( $re_id_attache );
 		$new_attach_title = $re_attache->post_title;
@@ -106,17 +109,23 @@ class OrganizeMediaLibrary {
 
 		$exts = explode('.', $url_attach);
 		$ext = end($exts);
-		$suffix_attach_file = '.'.$ext;
 
-		$filename = str_replace(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL.'/', '', $url_attach);
-
-		$postdategmt = $re_attache->post_date_gmt;
-
-		// Move YearMonth Folders
-		if ( $yearmonth_folders == 1 ) {
-			$y = substr( $postdategmt, 0, 4 );
-			$m = substr( $postdategmt, 5, 2 );
-			$subdir = "/$y/$m";
+		if ( $folderset === 'movefolder' ) {
+			$suffix_attach_file = '.'.$ext;
+			$filename = str_replace(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL.'/', '', $url_attach);
+			$postdategmt = $re_attache->post_date_gmt;
+			if ( $yearmonth_folders == 1 ) { 		// Move YearMonth Folders
+				$y = substr( $postdategmt, 0, 4 );
+				$m = substr( $postdategmt, 5, 2 );
+				$subdir = "/$y/$m";
+			} else {
+				$subdir = str_replace(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH, '', $target_folder);
+				if (DIRECTORY_SEPARATOR === '\\' && mb_language() === 'Japanese') {
+					$subdir = mb_convert_encoding($subdir, "sjis-win", "auto");
+				} else {
+					$subdir = mb_convert_encoding($subdir, "UTF-8", "auto");
+				}
+			}
 			$filename_base = wp_basename($filename);
 			if ( ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.'/'.$filename <> ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.$subdir.'/'.$filename_base ) {
 
@@ -190,6 +199,69 @@ class OrganizeMediaLibrary {
 		}
 
 		return array($ext, $new_attach_title, $new_url_attach, $url_replace_contents, $metadata);
+
+	}
+
+	/* ==================================================
+	 * @param	string	$dir
+	 * @return	array	$dirlist
+	 * @since	3.0
+	 */
+	function scan_dir($dir) {
+
+		$dirlist = $tmp = array();
+		$searchdir = glob($dir . '/*', GLOB_ONLYDIR);
+		if ( is_array($searchdir) ) {
+		    foreach($searchdir as $child_dir) {
+			    if ($tmp = $this->scan_dir($child_dir)) {
+		   		    $dirlist = array_merge($dirlist, $tmp);
+		       	}
+			}
+
+		    foreach($searchdir as $child_dir) {
+					$dirlist[] = $child_dir;
+			}
+		}
+
+		arsort($dirlist);
+		return $dirlist;
+
+	}
+
+	/* ==================================================
+	 * @param	string	$searchdir
+	 * @return	string	$dirlist
+	 * @since	3.0
+	 */
+	function dir_selectbox($searchdir) {
+
+		if( get_option('WPLANG') === 'ja' ) {
+			mb_language('Japanese');
+		} else if( get_option('WPLANG') === 'en' ) {
+			mb_language('English');
+		} else {
+			mb_language('uni');
+		}
+
+		$dirs = $this->scan_dir(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR);
+		$linkselectbox = NULL;
+		foreach ($dirs as $linkdir) {
+			$linkdirenc = mb_convert_encoding(str_replace(ABSPATH, "", $linkdir), "UTF-8", "auto");
+			if( $searchdir === $linkdirenc ){
+				$linkdirs = '<option value="'.urlencode($linkdirenc).'" selected>'.$linkdirenc.'</option>';
+			}else{
+				$linkdirs = '<option value="'.urlencode($linkdirenc).'">'.$linkdirenc.'</option>';
+			}
+			$linkselectbox = $linkselectbox.$linkdirs;
+		}
+		if( $searchdir ===  ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH ){
+			$linkdirs = '<option value="'.urlencode(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH).'" selected>'.ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH.'</option>';
+		}else{
+			$linkdirs = '<option value="'.urlencode(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH).'">'.ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH.'</option>';
+		}
+		$linkselectbox = $linkselectbox.$linkdirs;
+
+		return $linkselectbox;
 
 	}
 

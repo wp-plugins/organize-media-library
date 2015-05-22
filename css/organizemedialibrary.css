@@ -31,3 +31,12 @@
 	left: 40%;
 	top: 10%;
 }
+
+.item-organizemedialibrary-settings {
+	width: 100%;
+	height: 100%;
+	float: left;
+	margin: 5px;
+	padding: 5px;
+	border: #CCC 2px solid;
+}
