@@ -141,7 +141,11 @@ class OrganizeMediaLibrary {
 				foreach ( glob($delfilename) as $val ) {
 					unlink($val);
 				}
-				$filename = ltrim($subdir, '/').'/'.$filename_base;
+				if( !empty($subdir) ) {
+					$filename = ltrim($subdir, '/').'/'.$filename_base;
+				} else { // wp-content/uploads
+					$filename = $filename_base;
+				}
 				$new_url_attach = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL.'/'.$filename;
 				update_post_meta( $re_id_attache, '_wp_attached_file', $filename );
 
