@@ -135,10 +135,17 @@ class OrganizeMediaLibrary {
 				if ( file_exists(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.$subdir.'/'.$filename_base) ) {
 					$filename_base = wp_basename($filename, $suffix_attach_file).date_i18n( "dHis", FALSE, FALSE ).$suffix_attach_file;
 				}
-				copy( ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.'/'.$filename, ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.$subdir.'/'.$filename_base );
 				$filedirname = str_replace( wp_basename( $filename ), '', $filename );
-				$delfilename = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.'/'.$filedirname.wp_basename( $filename, '.'.$ext ).'*';
-				foreach ( glob($delfilename) as $val ) {
+				$copydelfilename = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.'/'.$filedirname.wp_basename( $filename, '.'.$ext ).'*';
+				foreach ( glob($copydelfilename) as $val ) {
+					if ( file_exists(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.$subdir.'/'.wp_basename($val)) ) {
+						$val2 = wp_basename($val, $suffix_attach_file).date_i18n( "dHis", FALSE, FALSE ).$suffix_attach_file;
+					} else {
+						$val2 = wp_basename($val);
+					}
+					copy( $val, ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR.$subdir.'/'.$val2 );
+				}
+				foreach ( glob($copydelfilename) as $val ) {
 					unlink($val);
 				}
 				if( !empty($subdir) ) {

@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, audios, gallery, thumbnails, uploads, images, media, media library, videos
 Requires at least: 3.6.0
 Tested up to: 4.2
-Stable tag: 3.1
+Stable tag: 3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,6 +38,9 @@ none
 4. Settings
 
 == Changelog ==
+
+= 3.2 =
+Add to the replacement object without deleting the old thumbnail.
 
 = 3.1 =
 Fixed problem of conversion.(wp-content/uploads/yyyy/mm --> wp-content/uploads)
@@ -86,6 +89,7 @@ Change languages.
 
 == Upgrade Notice ==
 
+= 3.2 =
 = 3.1 =
 = 3.0 =
 = 2.0 =
