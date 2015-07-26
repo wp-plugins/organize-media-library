@@ -2,7 +2,7 @@
 /*
 Plugin Name: Organize Media Library
 Plugin URI: http://wordpress.org/plugins/organize-media-library/
-Version: 3.3
+Version: 3.4
 Description: Thumbnails rebuild and organize uploads into month- and year-based folders or specified folders. URL in the content, replace with the new URL.
 Author: Katsushi Kawamori
 Author URI: http://riverforest-wp.info/
@@ -30,14 +30,33 @@ Domain Path: /languages
 	define("ORGANIZEMEDIALIBRARY_PLUGIN_BASE_FILE", plugin_basename(__FILE__));
 	define("ORGANIZEMEDIALIBRARY_PLUGIN_BASE_DIR", dirname(__FILE__));
 	define("ORGANIZEMEDIALIBRARY_PLUGIN_URL", plugins_url($path='',$scheme=null).'/organize-media-library');
+
+	include_once ORGANIZEMEDIALIBRARY_PLUGIN_BASE_DIR.'/inc/OrganizeMediaLibrary.php';
+	$organizemedialibrary = new OrganizeMediaLibrary();
 	$wp_uploads = wp_upload_dir();
-	if(is_ssl()){
-		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL", str_replace('http:', 'https:', $wp_uploads['baseurl']));
+
+	$relation_path_true = strpos($wp_uploads['baseurl'], '../');
+	if ( $relation_path_true > 0 ) {
+		$relationalpath = substr($wp_uploads['baseurl'], $relation_path_true);
+		$basepath = substr($wp_uploads['baseurl'], 0, $relation_path_true);
+		$upload_url = $organizemedialibrary->realurl($basepath, $relationalpath);
+		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR", realpath($wp_uploads['basedir']));
 	} else {
-		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL", $wp_uploads['baseurl']);
+		$upload_url = $wp_uploads['baseurl'];
+		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR", $wp_uploads['basedir']);
 	}
-	define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR", $wp_uploads['basedir']);
-	define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH", str_replace(site_url('/'), '', ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL));
+	unset($organizemedialibrary);
+
+	if(is_ssl()){
+		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL", str_replace('http:', 'https:', $upload_url));
+	} else {
+		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL", $upload_url);
+	}
+	if ( $relation_path_true > 0 ) {
+		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH", $relationalpath);
+	} else {
+		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH", str_replace(site_url('/'), '', ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL));
+	}
 
 	require_once( ORGANIZEMEDIALIBRARY_PLUGIN_BASE_DIR.'/req/OrganizeMediaLibraryRegist.php' );
 	$organizemedialibraryregist = new OrganizeMediaLibraryRegist();

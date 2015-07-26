@@ -258,8 +258,13 @@ class OrganizeMediaLibrary {
 
 		$dirs = $this->scan_dir(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR);
 		$linkselectbox = NULL;
+		$wordpress_path = str_replace("\\", "/", ABSPATH);
 		foreach ($dirs as $linkdir) {
-			$linkdirenc = mb_convert_encoding(str_replace(ABSPATH, "", $linkdir), "UTF-8", "auto");
+			if ( strstr($linkdir, $wordpress_path ) ) {
+				$linkdirenc = mb_convert_encoding(str_replace($wordpress_path, '', $linkdir), "UTF-8", "auto");
+			} else {
+				$linkdirenc = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH.mb_convert_encoding(str_replace(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR, "", $linkdir), "UTF-8", "auto");
+			}
 			if( $searchdir === $linkdirenc ){
 				$linkdirs = '<option value="'.urlencode($linkdirenc).'" selected>'.$linkdirenc.'</option>';
 			}else{
@@ -275,6 +280,54 @@ class OrganizeMediaLibrary {
 		$linkselectbox = $linkselectbox.$linkdirs;
 
 		return $linkselectbox;
+
+	}
+
+	/* ==================================================
+	 * @param	string	$base
+	 * @param	string	$relationalpath
+	 * @return	string	realurl
+	 * @since	3.4
+	 */
+	function realurl( $base, $relationalpath ){
+	     $parse = array(
+	          "scheme" => null,
+	          "user" => null,
+	          "pass" => null,
+	          "host" => null,
+	          "port" => null,
+	          "query" => null,
+	          "fragment" => null
+	     );
+	     $parse = parse_url( $base );
+
+	     if( strpos($parse["path"], "/", (strlen($parse["path"])-1)) !== false ){
+	          $parse["path"] .= ".";
+	     }
+
+	     if( preg_match("#^https?://#", $relationalpath) ){
+	          return $relationalpath;
+	     }else if( preg_match("#^/.*$#", $relationalpath) ){
+	          return $parse["scheme"] . "://" . $parse["host"] . $relationalpath;
+	     }else{
+	          $basePath = explode("/", dirname($parse["path"]));
+	          $relPath = explode("/", $relationalpath);
+	          foreach( $relPath as $relDirName ){
+	               if( $relDirName == "." ){
+	                    array_shift( $basePath );
+	                    array_unshift( $basePath, "" );
+	               }else if( $relDirName == ".." ){
+	                    array_pop( $basePath );
+	                    if( count($basePath) == 0 ){
+	                         $basePath = array("");
+	                    }
+	               }else{
+	                    array_push($basePath, $relDirName);
+	               }
+	          }
+	          $path = implode("/", $basePath);
+	          return $parse["scheme"] . "://" . $parse["host"] . $path;
+	     }
 
 	}
 

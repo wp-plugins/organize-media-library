@@ -283,6 +283,7 @@ class OrganizeMediaLibraryAdmin {
 
 		<?php
 
+		$searchdir_db = str_replace('../', '', $searchdir);
 		global $wpdb;
 		$postmimetype = NULL;
 		if ( !empty($mimefilter) ) {
@@ -292,7 +293,7 @@ class OrganizeMediaLibraryAdmin {
 						SELECT	ID, post_title
 						FROM	$wpdb->posts
 						WHERE	post_type = 'attachment'
-								and guid LIKE '%%$searchdir%%'
+								and guid LIKE '%%$searchdir_db%%'
 								$postmimetype
 								ORDER BY post_date DESC
 						");
@@ -318,12 +319,14 @@ class OrganizeMediaLibraryAdmin {
 		$this->postcount = 0;
 
 		if ( $adddb <> 'TRUE' ) {
+			$wordpress_path = str_replace("\\", "/", ABSPATH);
 			?>
 			<form method="post" action="<?php echo $scriptname; ?>">
 				<input type="hidden" name="adddb" value="FALSE">
 				<div style="float:left;"><?php _e('Number of items per page:'); ?><input type="text" name="organizemedialibrary_pagemax" value="<?php echo $pagemax; ?>" size="3" /></div>
 				<input type="submit" class="button" name="ShowToPage" value="<?php _e('Save') ?>" />
 				<div style="clear: both;"></div>
+				<div style="font-size: small; font-weight: bold;"><code><?php echo $wordpress_path; ?></code></div>
 				<div>
 					<select name="searchdir" style="width: 250px;">
 					<?php echo $organizemedialibrary->dir_selectbox($searchdir); ?>
@@ -565,8 +568,17 @@ class OrganizeMediaLibraryAdmin {
 
 		switch ($submenu) {
 			case 1:
+				if ( !empty($_POST['organizemedialibrary_max_execution_time']) ) {
+					$max_execution_time = intval($_POST['organizemedialibrary_max_execution_time']);
+				} else {
+					$max_execution_time = $organizemedialibrary_settings['max_execution_time'];
+				}
 				if ( !empty($_POST['organizemedialibrary_folderset']) ) {
 					$folderset = $_POST['organizemedialibrary_folderset'];
+				} else {
+					$folderset = $organizemedialibrary_settings['folderset'];
+				}
+				if ( $folderset === 'movefolder' ) {
 					if (!empty($_POST['targetdir'])){
 						$targetdir = urldecode($_POST['targetdir']);
 						if( get_option('WPLANG') === 'ja' ) {
@@ -579,39 +591,40 @@ class OrganizeMediaLibraryAdmin {
 						$newdir = NULL;
 						if (!empty($_POST['newdir'])){
 							$newdir = urldecode($_POST['newdir']);
+							$target_realdir = realpath(ABSPATH.$targetdir).'/'.$newdir;
 							$targetdir = $targetdir.'/'.$newdir;
 							if (DIRECTORY_SEPARATOR === '\\' && mb_language() === 'Japanese') {
-								$mkdir_targetdir = mb_convert_encoding($targetdir, "sjis-win", "auto");
+								$mkdir_targetdir = mb_convert_encoding($target_realdir, "sjis-win", "auto");
 							} else {
-								$mkdir_targetdir = mb_convert_encoding($targetdir, "UTF-8", "auto");
+								$mkdir_targetdir = mb_convert_encoding($target_realdir, "UTF-8", "auto");
 							}
-							if ( !file_exists(ABSPATH.$targetdir) ) {
-								mkdir(ABSPATH.$mkdir_targetdir, 0757, true);
+							if ( !file_exists($mkdir_targetdir) ) {
+								mkdir($mkdir_targetdir, 0757, true);
 							}
 							$targetdir = mb_convert_encoding($targetdir, "UTF-8", "auto");
 						}
 					} else {
 						$targetdir = $organizemedialibrary_settings['targetdir'];
+						if ( !strstr(realpath(ABSPATH.$targetdir),realpath(ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR)) ) {
+							$targetdir = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH;
+						}
 					}
-					if ( !empty($_POST['organizemedialibrary_max_execution_time']) ) {
-						$max_execution_time = intval($_POST['organizemedialibrary_max_execution_time']);
-					} else {
-						$max_execution_time = $organizemedialibrary_settings['max_execution_time'];
-					}
-					$organizemedialibrary_tbl = array(
-										'pagemax' => $organizemedialibrary_settings['pagemax'],
-										'folderset' => $folderset,
-										'targetdir' => $targetdir,
-										'max_execution_time' => $max_execution_time
-										);
-					update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
-					if ( !empty($_POST['move_yearmonth_folders']) ) {
-						update_option( 'uploads_use_yearmonth_folders', $_POST['move_yearmonth_folders'] );
-					} else {
-						update_option( 'uploads_use_yearmonth_folders', '0' );
-					}
-					echo '<div class="updated"><ul><li>'.__('Settings').' --> '.__('Changes saved.').'</li></ul></div>';
+				} else {
+					$targetdir = $organizemedialibrary_settings['targetdir'];
 				}
+				$organizemedialibrary_tbl = array(
+									'pagemax' => $organizemedialibrary_settings['pagemax'],
+									'folderset' => $folderset,
+									'targetdir' => $targetdir,
+									'max_execution_time' => $max_execution_time
+									);
+				update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
+				if ( !empty($_POST['move_yearmonth_folders']) ) {
+					update_option( 'uploads_use_yearmonth_folders', $_POST['move_yearmonth_folders'] );
+				} else {
+					update_option( 'uploads_use_yearmonth_folders', '0' );
+				}
+				echo '<div class="updated"><ul><li>'.__('Settings').' --> '.__('Changes saved.').'</li></ul></div>';
 				break;
 			case 2:
 				if ( !empty($_POST['organizemedialibrary_pagemax']) ) {
