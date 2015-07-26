@@ -624,7 +624,9 @@ class OrganizeMediaLibraryAdmin {
 				} else {
 					update_option( 'uploads_use_yearmonth_folders', '0' );
 				}
-				echo '<div class="updated"><ul><li>'.__('Settings').' --> '.__('Changes saved.').'</li></ul></div>';
+				if ( !empty($_POST) ) {
+					echo '<div class="updated"><ul><li>'.__('Settings').' --> '.__('Changes saved.').'</li></ul></div>';
+				}
 				break;
 			case 2:
 				if ( !empty($_POST['organizemedialibrary_pagemax']) ) {

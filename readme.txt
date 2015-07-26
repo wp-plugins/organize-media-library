@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, audios, gallery, thumbnails, uploads, images, media, media library, videos
 Requires at least: 3.6.0
 Tested up to: 4.2
-Stable tag: 3.4
+Stable tag: 3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,15 +32,19 @@ none
 
 == Screenshots ==
 
-1. Search media display
-2. Rebuild media selection
-3. Media rebuild result
-4. Settings
+1. Settings
+2. Search media display
+3. Rebuild media selection
+4. Media rebuild result
 
 == Changelog ==
 
+= 3.5 =
+Change readme.txt.
+Fixed problem of display.
+
 = 3.4 =
-Please edit the [wp-config.php](http://codex.wordpress.org/Editing_wp-config.php#Moving_uploads_folder). Or please [upload_path] specified in the relative path. Please do not use other methods.
+Supported moving uploads folder. Please edit the [wp-config.php](http://codex.wordpress.org/Editing_wp-config.php#Moving_uploads_folder). Or please [upload_path] specified in the relative path. Please do not use other methods.
 
 = 3.3 =
 Fixed problem of moving image of similiar name.
@@ -95,6 +99,7 @@ Change languages.
 
 == Upgrade Notice ==
 
+= 3.5 =
 = 3.4 =
 = 3.3 =
 = 3.2 =
