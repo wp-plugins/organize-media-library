@@ -33,6 +33,10 @@ class OrganizeMediaLibraryRegist {
 		if ( !get_option('organizemedialibrary_settings') ) {
 			$organizemedialibrary_tbl = array(
 								'pagemax' => 20,
+								'basedir' => ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH,
+								'prev_upload_dir' => ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR,
+								'prev_upload_url' => ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL,
+								'prev_upload_path' => ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH,
 								'folderset' => 'movefolder',
 								'targetdir' => ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH,
 								'max_execution_time' => 300
@@ -56,7 +60,7 @@ class OrganizeMediaLibraryRegist {
 									'max_execution_time' => $organizemedialibrary_settings['max_execution_time']
 								);
 				update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
-			} else if ( $plugin_version >= 3.0 ) {
+			} else if ( $plugin_version >= 3.0  && $plugin_version < 4.0 ) {
 				if ( array_key_exists( "folderset", $organizemedialibrary_settings ) ) {
 					$folderset = $organizemedialibrary_settings['folderset'];
 				} else {
@@ -71,6 +75,38 @@ class OrganizeMediaLibraryRegist {
 									'pagemax' => $organizemedialibrary_settings['pagemax'],
 									'folderset' => $folderset,
 									'targetdir' => $targetdir,
+									'max_execution_time' => $organizemedialibrary_settings['max_execution_time']
+								);
+				update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );
+			} else if ( $plugin_version >= 4.0 ) {
+				if ( array_key_exists( "basedir", $organizemedialibrary_settings ) ) {
+					$basedir = $organizemedialibrary_settings['basedir'];
+				} else {
+					$basedir = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH;
+				}
+				if ( array_key_exists( "prev_upload_dir", $organizemedialibrary_settings ) ) {
+					$upload_dir = $organizemedialibrary_settings['prev_upload_dir'];
+				} else {
+					$upload_dir = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR;
+				}
+				if ( array_key_exists( "prev_upload_url", $organizemedialibrary_settings ) ) {
+					$upload_url = $organizemedialibrary_settings['prev_upload_url'];
+				} else {
+					$upload_url = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL;
+				}
+				if ( array_key_exists( "prev_upload_path", $organizemedialibrary_settings ) ) {
+					$upload_path = $organizemedialibrary_settings['prev_upload_path'];
+				} else {
+					$upload_path = ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH;
+				}
+				$organizemedialibrary_tbl = array(
+									'pagemax' => $organizemedialibrary_settings['pagemax'],
+									'basedir' => $basedir,
+									'prev_upload_dir' => $upload_dir,
+									'prev_upload_url' => $upload_url,
+									'prev_upload_path' => $upload_path,
+									'folderset' => $organizemedialibrary_settings['folderset'],
+									'targetdir' => $organizemedialibrary_settings['targetdir'],
 									'max_execution_time' => $organizemedialibrary_settings['max_execution_time']
 								);
 				update_option( 'organizemedialibrary_settings', $organizemedialibrary_tbl );

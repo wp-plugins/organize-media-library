@@ -2,8 +2,8 @@
 /*
 Plugin Name: Organize Media Library
 Plugin URI: http://wordpress.org/plugins/organize-media-library/
-Version: 3.5
-Description: Thumbnails rebuild and organize uploads into month- and year-based folders or specified folders. URL in the content, replace with the new URL.
+Version: 4.0
+Description: Thumbnails rebuild and organize uploads into month- and year-based folders or specified folders. Move the upload folder, it is possible to move all uploaded files. URL in the content, replace with the new URL.
 Author: Katsushi Kawamori
 Author URI: http://riverforest-wp.info/
 Text Domain: organizemedialibrary
@@ -33,30 +33,11 @@ Domain Path: /languages
 
 	include_once ORGANIZEMEDIALIBRARY_PLUGIN_BASE_DIR.'/inc/OrganizeMediaLibrary.php';
 	$organizemedialibrary = new OrganizeMediaLibrary();
-	$wp_uploads = wp_upload_dir();
-
-	$relation_path_true = strpos($wp_uploads['baseurl'], '../');
-	if ( $relation_path_true > 0 ) {
-		$relationalpath = substr($wp_uploads['baseurl'], $relation_path_true);
-		$basepath = substr($wp_uploads['baseurl'], 0, $relation_path_true);
-		$upload_url = $organizemedialibrary->realurl($basepath, $relationalpath);
-		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR", realpath($wp_uploads['basedir']));
-	} else {
-		$upload_url = $wp_uploads['baseurl'];
-		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR", $wp_uploads['basedir']);
-	}
-	unset($organizemedialibrary);
-
-	if(is_ssl()){
-		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL", str_replace('http:', 'https:', $upload_url));
-	} else {
-		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL", $upload_url);
-	}
-	if ( $relation_path_true > 0 ) {
-		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH", $relationalpath);
-	} else {
-		define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH", str_replace(site_url('/'), '', ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL));
-	}
+	list($upload_dir, $upload_url, $upload_path) = $organizemedialibrary->upload_dir_url_path();
+	define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_DIR", $upload_dir);
+	define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_URL", $upload_url);
+	define("ORGANIZEMEDIALIBRARY_PLUGIN_UPLOAD_PATH", $upload_path);
+	unset($organizemedialibrary ,$upload_dir, $upload_url, $upload_path);
 
 	require_once( ORGANIZEMEDIALIBRARY_PLUGIN_BASE_DIR.'/req/OrganizeMediaLibraryRegist.php' );
 	$organizemedialibraryregist = new OrganizeMediaLibraryRegist();

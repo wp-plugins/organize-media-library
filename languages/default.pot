@@ -13,7 +13,7 @@ msgstr ""
 msgid "Search & Rebuild & Organize"
 msgstr ""
 
-msgid "Thumbnails rebuild and organize uploads into month- and year-based folders or specified folders. URL in the content, replace with the new URL."
+msgid "Thumbnails rebuild and organize uploads into month- and year-based folders or specified folders. Move the upload folder, it is possible to move all uploaded files. URL in the content, replace with the new URL."
 
 msgid "The following media has been rebuild organize."
 msgstr ""
@@ -54,4 +54,28 @@ msgid "Only rebuild of metadata."
 msgstr ""
 
 msgid "Organize files into a folder."
+msgstr ""
+
+msgid "Move Uploads folder & Rebuild & Organize"
+msgstr ""
+
+msgid "Move Uploads folder"
+msgstr ""
+
+msgid "Specified in the relative path"
+msgstr ""
+
+msgid "When you want to restore the original settings of the above, please be blank."
+msgstr ""
+
+msgid "It will move the upload folder."
+msgstr ""
+
+msgid "It will move all of the upload files to a new folder."
+msgstr ""
+
+msgid "It will convert the URL of the uploaded files in all published content."
+msgstr ""
+
+msgid "Media has not been rebuild organize."
 msgstr ""

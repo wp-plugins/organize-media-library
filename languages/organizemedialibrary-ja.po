@@ -4,37 +4,29 @@ msgstr ""
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
 "Last-Translator: Katsushi Kawamori <dodesyoswift312@gmail.com>\n"
-"Language-Team:  <dodesyoswift312@gmail.com>\n"
+"Language-Team: dodesyoswift312@gmail.com\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.6.7\n"
+"X-Generator: Poedit 1.8.4\n"
 "Language: ja\n"
 
 msgid "Search & Rebuild & Organize"
 msgstr "検索＆再構築＆整理"
 
-msgid ""
-"Thumbnails rebuild and organize uploads into month- and year-based folders "
-"or specified folders. URL in the content, replace with the new URL."
+msgid "Thumbnails rebuild and organize uploads into month- and year-based folders or specified folders. Move the upload folder, it is possible to move all uploaded files. URL in the content, replace with the new URL."
 msgstr ""
-"サムネイルを再構築し、年月ベースのフォルダあるいは指定したフォルダに整理しま"
-"す。コンテンツ内のURLは、新しいURLで置き換えます。"
+"サムネイルを再構築し、年月ベースのフォルダあるいは指定したフォルダに整理します。アップロードフォルダを移動し、アップロードされた全てのファイルを移動させることが可能です。コンテンツ内のURLは、新しいURLで置き換えま"
+"す。"
 
 msgid "The following media has been rebuild organize."
 msgstr "以下のメディアは、整理・再構築されています。"
 
-msgid ""
-"Please try again pressing Back button, if the processing is stopped on the "
-"way."
-msgstr ""
-"処理が途中で停止している場合は、[戻る]ボタンを押して再度お試しください。"
+msgid "Please try again pressing Back button, if the processing is stopped on the way."
+msgstr "処理が途中で停止している場合は、[戻る]ボタンを押して再度お試しください。"
 
-msgid ""
-"Please make a donation if you like my work or would like to further the "
-"development of this plugin."
-msgstr ""
-"私はプラグインの開発とサポートを継続させるために寄付を必要としています。"
+msgid "Please make a donation if you like my work or would like to further the development of this plugin."
+msgstr "私はプラグインの開発とサポートを継続させるために寄付を必要としています。"
 
 msgid "The number of seconds a script is allowed to run."
 msgstr "スクリプトが実行可能な秒数。"
@@ -65,3 +57,27 @@ msgstr "メタデータのみの再構築。"
 
 msgid "Organize files into a folder."
 msgstr "フォルダにファイルを整理します。"
+
+msgid "Move Uploads folder & Rebuild & Organize"
+msgstr "アップロードフォルダ移動＆再構築＆整理"
+
+msgid "Move Uploads folder"
+msgstr "アップロードフォルダ移動"
+
+msgid "Specified in the relative path"
+msgstr "相対パスを指定"
+
+msgid "When you want to restore the original settings of the above, please be blank."
+msgstr "上記のデフォルト設定に戻したい場合には、空白を入力してください。 "
+
+msgid "It will move the upload folder."
+msgstr "アップロードフォルダを移動します。"
+
+msgid "It will move all of the upload files to a new folder."
+msgstr "全てのアップロードファイルを新しいフォルダへ移動します。"
+
+msgid "It will convert the URL of the uploaded files in all published content."
+msgstr "全ての公開コンテンツ内のアップロードファイルのURLを変換します。"
+
+msgid "Media has not been rebuild organize."
+msgstr "メディアは整理・再構築されていません。"
